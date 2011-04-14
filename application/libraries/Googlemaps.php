@@ -176,7 +176,7 @@ class Googlemaps {
 		
 		$polyline['points'] = array();
 		$polyline['strokeColor'] = '#FF0000';
-		$polyline['strokeOpactiy'] = '1.0';
+		$polyline['strokeOpacity'] = '1.0';
 		$polyline['strokeWeight'] = '2';
 	
 		$polyline_output = '';
@@ -224,7 +224,7 @@ class Googlemaps {
 				var polyline_'.count($this->polylines).' = new google.maps.Polyline({
     				path: polyline_plan_'.count($this->polylines).',
     				strokeColor: "'.$polyline['strokeColor'].'",
-    				strokeOpacity: '.$polyline['strokeOpactiy'].',
+    				strokeOpacity: '.$polyline['strokeOpacity'].',
     				strokeWeight: '.$polyline['strokeWeight'].'
  				});
 				
@@ -245,7 +245,7 @@ class Googlemaps {
 		
 		$polygon['points'] = array();
 		$polygon['strokeColor'] = '#FF0000';
-		$polygon['strokeOpactiy'] = '0.8';
+		$polygon['strokeOpacity'] = '0.8';
 		$polygon['strokeWeight'] = '2';
 		$polygon['fillColor'] = '#FF0000';
 		$polygon['fillOpacity'] = '0.3';
@@ -295,7 +295,7 @@ class Googlemaps {
 				var polygon_'.count($this->polygons).' = new google.maps.Polygon({
     				path: polygon_plan_'.count($this->polygons).',
     				strokeColor: "'.$polygon['strokeColor'].'",
-    				strokeOpacity: '.$polygon['strokeOpactiy'].',
+    				strokeOpacity: '.$polygon['strokeOpacity'].',
     				strokeWeight: '.$polygon['strokeWeight'].',
 					fillColor: "'.$polygon['fillColor'].'",
 					fillOpacity: '.$polygon['fillOpacity'].'
