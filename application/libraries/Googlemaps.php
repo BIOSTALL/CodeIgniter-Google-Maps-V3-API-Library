@@ -63,6 +63,9 @@ class Googlemaps {
 				$this->$key = $val;
 			}
 		}
+		
+		if ($this->sensor) { $this->sensor = "true"; }else{ $this->sensor = "false"; }
+		
 	}
 	
 	function add_marker($params = array())
@@ -317,8 +320,6 @@ class Googlemaps {
 		$this->output_js = '';
 		$this->output_js_contents = '';
 		$this->output_html = '';
-		
-		if ($this->sensor) { $this->sensor = "true"; }else{ $this->sensor = "false"; }
 		
 		$this->output_js .= '
 		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor='.$this->sensor;
