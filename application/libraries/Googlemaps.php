@@ -80,6 +80,7 @@ class Googlemaps {
 		$marker['draggable'] = FALSE;
 		$marker['flat'] = FALSE;
 		$marker['icon'] = '';
+		$marker['onclick'] = '';
 		$marker['shadow'] = '';
 		$marker['title'] = '';
 		$marker['visible'] = TRUE;
@@ -159,8 +160,20 @@ class Googlemaps {
 			google.maps.event.addListener(marker, "click", function() {
 				iw.setContent(this.get("content"));
 				iw.open('.$this->map_name.', this);
+			';
+			if ($marker['onclick']!="") { $marker_output .= $marker['onclick'].'
+			'; }
+			$marker_output .= '
 			});
 			';
+		}else{
+			if ($marker['onclick']!="") { 
+				$marker_output .= '
+				google.maps.event.addListener(marker, "click", function() {
+					'.$marker['onclick'].'
+				});
+				';
+			}
 		}
 		
 		$marker_output .= '
