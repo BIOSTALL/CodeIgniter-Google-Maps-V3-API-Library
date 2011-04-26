@@ -81,6 +81,8 @@ class Googlemaps {
 		$marker['flat'] = FALSE;
 		$marker['icon'] = '';
 		$marker['onclick'] = '';
+		$marker['ondragstart'] = '';
+		$marker['ondragend'] = '';
 		$marker['shadow'] = '';
 		$marker['title'] = '';
 		$marker['visible'] = TRUE;
@@ -171,6 +173,23 @@ class Googlemaps {
 				$marker_output .= '
 				google.maps.event.addListener(marker, "click", function() {
 					'.$marker['onclick'].'
+				});
+				';
+			}
+		}
+		
+		if ($marker['draggable']) {
+			if ($marker['ondragend']!="") { 
+				$marker_output .= '
+				google.maps.event.addListener(marker, "dragend", function() {
+					'.$marker['ondragend'].'
+				});
+				';
+			}
+			if ($marker['ondragstart']!="") { 
+				$marker_output .= '
+				google.maps.event.addListener(marker, "dragstart", function() {
+					'.$marker['ondragstart'].'
 				});
 				';
 			}
