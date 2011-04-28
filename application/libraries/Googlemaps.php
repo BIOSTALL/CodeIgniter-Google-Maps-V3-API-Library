@@ -13,7 +13,12 @@
  */
  
 class Googlemaps {
-
+	
+	var $adsense					= FALSE;
+	var $adsenseChannelNumber		= '';
+	var $adsenseFormat				= 'HALF_BANNER';
+	var $adsensePosition			= 'TOP_CENTER';
+	var $adsensePublisherID			= '';
 	var $center						= "37.4419, -122.1419";
 	var $disableDefaultUI			= FALSE;
 	var $disableMapTypeControl		= FALSE;
@@ -356,6 +361,7 @@ class Googlemaps {
 		$this->output_js .= '
 		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor='.$this->sensor;
 		if ($this->region!="" && strlen($this->region)==2) { $this->output_js .= '&region='.strtoupper($this->region); }
+		if ($this->adsense!="") { $this->output_js .= '&libraries=adsense'; }
 		$this->output_js .= '"></script>';
 		if ($this->jsfile=="") {
 			$this->output_js .= '
@@ -369,8 +375,14 @@ class Googlemaps {
 			var iw = new google.maps.InfoWindow(); // Global declaration of the infowindow
 			var lat_longs = new Array();
 			var markers = new Array();
+			';
 		
-		  	function initialize() {
+		if ($this->adsense) { 
+			$this->output_js_contents .= 'var adUnit;
+			'; 
+		}
+		
+		$this->output_js_contents .= 'function initialize() {
 				
 				';
 				
@@ -483,6 +495,26 @@ class Googlemaps {
 			}
 			'.$this->map_name.'.fitBounds(bounds);
 			';
+		}
+		
+		if ($this->adsense) { 
+			$this->output_js_contents .= '
+			var adUnitDiv = document.createElement("div");
+
+		    // Note: replace the publisher ID noted here with your own
+		    // publisher ID.
+		    var adUnitOptions = {
+		    	format: google.maps.adsense.AdFormat.'.$this->adsenseFormat.',
+		    	position: google.maps.ControlPosition.'.$this->adsensePosition.',
+		    	publisherId: "'.$this->adsensePublisherID.'",
+		    	';
+		    if ($this->adsenseChannelNumber!="") { $this->output_js_contents .= 'channelNumber: "'.$this->adsenseChannelNumber.'",
+		    	'; }
+		    $this->output_js_contents .= 'map: map,
+		    	visible: true
+		    };
+		    adUnit = new google.maps.adsense.AdUnit(adUnitDiv, adUnitOptions);
+		    ';
 		}
 		
 		$this->output_js_contents .= '
