@@ -48,6 +48,7 @@ class Googlemaps {
 	var	$markers					= array();	
 	var	$polylines					= array();
 	var	$polygons					= array();
+	var	$circles					= array();
 	
 	function Googlemaps($config = array())
 	{
@@ -351,6 +352,69 @@ class Googlemaps {
 	
 	}
 	
+	function add_circle($params = array())
+	{
+		
+		$circle = array();
+		
+		$circle['center'] = '';
+		$circle['radius'] = 0;
+		$circle['strokeColor'] = '0.8';
+		$circle['strokeOpacity'] = '0.8';
+		$circle['strokeWeight'] = '2';
+		$circle['fillColor'] = '#FF0000';
+		$circle['fillOpacity'] = '0.3';
+	
+		$circle_output = '';
+		
+		foreach ($params as $key => $value) {
+		
+			if (isset($circle[$key])) {
+			
+				$circle[$key] = $value;
+				
+			}
+			
+		}
+		
+		if ($circle['radius']>0 && $circle['center']!="") {
+			
+			$lat_long_to_push = '';
+			if ($this->is_lat_long($circle['center'])) {
+				$lat_long_to_push = $circle['center'];
+				$circle_output = '
+				var circleCenter = new google.maps.LatLng('.$circle['center'].')
+				';
+			}else{
+				$lat_long = $this->get_lat_long_from_address($circle['center']);
+				$circle_output = '
+				var circleCenter = new google.maps.LatLng('.$lat_long[0].', '.$lat_long[1].')';
+				$lat_long_to_push = $lat_long[0].', '.$lat_long[1];
+			}
+			$circle_output .= '
+				lat_longs.push(new google.maps.LatLng('.$lat_long_to_push.'));
+			';
+			
+			$circle_output .= '
+				var circleOptions = {
+					strokeColor: "'.$circle['strokeColor'].'",
+					strokeOpacity: '.$circle['strokeOpacity'].',
+					strokeWeight: '.$circle['strokeWeight'].',
+					fillColor: "'.$circle['fillColor'].'",
+					fillOpacity: '.$circle['fillOpacity'].',
+					map: map,
+					center: circleCenter,
+					radius: '.$circle['radius'].'
+				};
+				var circle_'.count($this->circles).' = new google.maps.Circle(circleOptions);
+			';
+		
+			array_push($this->circles, $circle_output);
+			
+		}
+	
+	}
+	
 	function create_map()
 	{
 	
@@ -483,6 +547,14 @@ class Googlemaps {
 		if (count($this->polygons)) {
 			foreach ($this->polygons as $polygon) {
 				$this->output_js_contents .= $polygon;
+			}
+		}	
+		//
+		
+		// add circles
+		if (count($this->circles)) {
+			foreach ($this->circles as $circle) {
+				$this->output_js_contents .= $circle;
 			}
 		}	
 		//
