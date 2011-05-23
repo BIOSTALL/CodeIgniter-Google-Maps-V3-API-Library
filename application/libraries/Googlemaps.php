@@ -50,7 +50,7 @@ class Googlemaps {
 	var	$polygons					= array();
 	var	$circles					= array();
 	
-	var $directions					= TRUE;
+	var $directions					= FALSE;
 	var $directionsStart			= "";
 	var $directionsEnd				= "";
 	var $directionsDivID			= "";
