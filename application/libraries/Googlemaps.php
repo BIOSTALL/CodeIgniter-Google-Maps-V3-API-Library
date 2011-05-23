@@ -53,6 +53,7 @@ class Googlemaps {
 	var $directions					= TRUE;
 	var $directionsStart			= "";
 	var $directionsEnd				= "";
+	var $directionsDivID			= "";
 	var $directionsMode				= "DRIVING"; // DRIVING, WALKING or BICYCLING (US Only)
 	var $directionsAvoidTolls		= FALSE;
 	var $directionsAvoidHighways	= FALSE;
@@ -533,6 +534,10 @@ class Googlemaps {
 		if ($this->directions) {
 			$this->output_js_contents .= 'directionsDisplay.setMap('.$this->map_name.');
 			';
+			if ($this->directionsDivID!="") {
+				$this->output_js_contents .= 'directionsDisplay.setPanel(document.getElementById("'.$this->directionsDivID.'"));
+			';
+			}
 		}
 		if ($this->onclick!="") { 
 			$this->output_js_contents .= 'google.maps.event.addListener(map, "click", function(event) {
