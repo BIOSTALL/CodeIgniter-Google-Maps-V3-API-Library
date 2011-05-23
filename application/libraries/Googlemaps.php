@@ -54,6 +54,8 @@ class Googlemaps {
 	var $directionsStart			= "";
 	var $directionsEnd				= "";
 	var $directionsMode				= "DRIVING"; // DRIVING, WALKING or BICYCLING (US Only)
+	var $directionsAvoidTolls		= FALSE;
+	var $directionsAvoidHighways	= FALSE;
 	
 	function Googlemaps($config = array())
 	{
@@ -623,7 +625,19 @@ class Googlemaps {
 			    	destination:end,
 			    	travelMode: google.maps.TravelMode.'.$this->directionsMode.'
 			    	';
-			if ($this->region!="" && strlen($this->region)==2) { $this->output_js_contents .= ',region: '.strtoupper($this->region); }
+			if ($this->region!="" && strlen($this->region)==2) { 
+				$this->output_js_contents .= ',region: '.strtoupper($this->region).'
+					'; 
+			}
+			if ($this->directionsAvoidTolls) { 
+				$this->output_js_contents .= ',avoidTolls: true
+					'; 
+			}
+			if ($this->directionsAvoidHighways) { 
+				$this->output_js_contents .= ',avoidHighways: true
+					'; 
+			}
+			
 			$this->output_js_contents .= '
 			};
 			  	directionsService.route(request, function(response, status) {
