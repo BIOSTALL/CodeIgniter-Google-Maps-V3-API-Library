@@ -50,6 +50,11 @@ class Googlemaps {
 	var	$polygons					= array();
 	var	$circles					= array();
 	
+	var $directions					= TRUE;
+	var $directionsStart			= "";
+	var $directionsEnd				= "";
+	var $directionsMode				= "DRIVING"; // DRIVING, WALKING or BICYCLING (US Only)
+	
 	function Googlemaps($config = array())
 	{
 		if (count($config) > 0)
@@ -440,7 +445,11 @@ class Googlemaps {
 			var lat_longs = new Array();
 			var markers = new Array();
 			';
-		
+		if ($this->directions) { 
+			$this->output_js_contents .= 'var directionsDisplay = new google.maps.DirectionsRenderer();
+			var directionsService = new google.maps.DirectionsService();
+			';
+		}
 		if ($this->adsense) { 
 			$this->output_js_contents .= 'var adUnit;
 			'; 
@@ -519,7 +528,10 @@ class Googlemaps {
 		$this->output_js_contents .= '}
 				'.$this->map_name.' = new google.maps.Map(document.getElementById("'.$this->map_div_id.'"), myOptions);
 				';
-		
+		if ($this->directions) {
+			$this->output_js_contents .= 'directionsDisplay.setMap('.$this->map_name.');
+			';
+		}
 		if ($this->onclick!="") { 
 			$this->output_js_contents .= 'google.maps.event.addListener(map, "click", function(event) {
     			'.$this->onclick.'
@@ -562,10 +574,12 @@ class Googlemaps {
 		if ($this->zoom=="auto") { 
 			$this->output_js_contents .= '
 			var bounds = new google.maps.LatLngBounds();
-			for (var i=0; i<lat_longs.length; i++) {
-				bounds.extend(lat_longs[i]);
+			if (lat_longs.length>0) {
+				for (var i=0; i<lat_longs.length; i++) {
+					bounds.extend(lat_longs[i]);
+				}
+				'.$this->map_name.'.fitBounds(bounds);
 			}
-			'.$this->map_name.'.fitBounds(bounds);
 			';
 		}
 		
@@ -589,11 +603,45 @@ class Googlemaps {
 		    ';
 		}
 		
+		if ($this->directions && $this->directionsStart!="" && $this->directionsEnd!="") {
+			$this->output_js_contents .= '
+				calcRoute(\''.$this->directionsStart.'\', \''.$this->directionsEnd.'\');
+			';
+		}
+		
 		$this->output_js_contents .= '
 			
 			}
 		
 		';
+		
+		if ($this->directions) {
+			
+			$this->output_js_contents .= 'function calcRoute(start, end) {
+			var request = {
+			    	origin:start,
+			    	destination:end,
+			    	travelMode: google.maps.TravelMode.'.$this->directionsMode.'
+			 	};
+			  	directionsService.route(request, function(response, status) {
+			    	if (status == google.maps.DirectionsStatus.OK) {
+			      		directionsDisplay.setDirections(response);
+			    	}else{
+			    		switch (status) { 	
+			    			case "NOT_FOUND": { alert("Either the start location or destination were not recognised"); break }
+			    			case "ZERO_RESULTS": { alert("No route could be found between the start location and destination"); break }
+			    			case "MAX_WAYPOINTS_EXCEEDED": { alert("Maximum waypoints exceeded. Maximum of 8 allowed"); break }
+			    			case "INVALID_REQUEST": { alert("Invalid request made for obtaining directions"); break }
+			    			case "OVER_QUERY_LIMIT": { alert("This webpage has sent too many requests recently. Please try again later"); break }
+			    			case "REQUEST_DENIED": { alert("This webpage is not allowed to request directions"); break }
+			    			case "UNKNOWN_ERROR": { alert("Unknown error with the server. Please try again later"); break }
+			    		}
+			    	}
+			  	});
+			}
+			';
+			
+		}
 		
 		$this->output_js_contents .= '
 		  	window.onload = initialize;
