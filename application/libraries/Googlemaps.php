@@ -402,7 +402,7 @@ class Googlemaps {
 					strokeWeight: '.$circle['strokeWeight'].',
 					fillColor: "'.$circle['fillColor'].'",
 					fillOpacity: '.$circle['fillOpacity'].',
-					map: map,
+					map: '.$this->map_name.',
 					center: circleCenter,
 					radius: '.$circle['radius'].'
 				};
