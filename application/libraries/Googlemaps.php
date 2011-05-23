@@ -622,7 +622,10 @@ class Googlemaps {
 			    	origin:start,
 			    	destination:end,
 			    	travelMode: google.maps.TravelMode.'.$this->directionsMode.'
-			 	};
+			    	';
+			if ($this->region!="" && strlen($this->region)==2) { $this->output_js_contents .= ',region: '.strtoupper($this->region); }
+			$this->output_js_contents .= '
+			};
 			  	directionsService.route(request, function(response, status) {
 			    	if (status == google.maps.DirectionsStatus.OK) {
 			      		directionsDisplay.setDirections(response);
