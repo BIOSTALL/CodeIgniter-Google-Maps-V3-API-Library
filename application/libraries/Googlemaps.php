@@ -10,53 +10,54 @@
  * @category	Libraries
  * @author		BIOSTALL (Steve Marks)
  * @link		http://biostall.com
+ * @docs		http://biostall.com/wp-content/uploads/2010/07/Google_Maps_V3_API_Documentation.pdf
  */
  
 class Googlemaps {
 	
-	var $adsense					= FALSE;
-	var $adsenseChannelNumber		= '';
-	var $adsenseFormat				= 'HALF_BANNER';
-	var $adsensePosition			= 'TOP_CENTER';
-	var $adsensePublisherID			= '';
-	var $center						= "37.4419, -122.1419";
-	var $disableDefaultUI			= FALSE;
-	var $disableMapTypeControl		= FALSE;
-	var $disableNavigationControl	= FALSE;
-	var $disableScaleControl		= FALSE;
-	var $disableDoubleClickZoom		= FALSE;
-	var $draggable					= TRUE;
-	var $draggableCursor			= '';
-	var $draggingCursor				= '';
-	var $navigationControlPosition	= '';
-	var $keyboardShortcuts			= TRUE;
-	var $jsfile						= '';
-	var $map_div_id					= "map_canvas";
-	var $map_height					= "450px";
-	var $map_name					= "map";
-	var $map_type					= "ROADMAP";
-	var $map_width					= "100%";
-	var $mapTypeControlPosition		= '';
-	var $onclick					= '';
-	var $region						= '';
-	var $scaleControlPosition		= '';
-	var $scrollwheel				= TRUE;
-	var $sensor						= FALSE;
-	var	$version					= "3";
-	var $zoom						= 13;
+	var $adsense					= FALSE; 					// Whether Google Adsense For Content should be enabled
+	var $adsenseChannelNumber		= ''; 						// The Adsense channel number for tracking the performance of this AdUnit
+	var $adsenseFormat				= 'HALF_BANNER';			// The format of the AdUnit
+	var $adsensePosition			= 'TOP_CENTER';				// The position of the AdUnit
+	var $adsensePublisherID			= '';						// Your Google AdSense publisher ID
+	var $center						= "37.4419, -122.1419";		// Sets the default center location (lat/long co-ordinate or address) of the map
+	var $disableDefaultUI			= FALSE;					// If set to TRUE will hide the default controls (ie. zoom, scale etc)
+	var $disableMapTypeControl		= FALSE;					// If set to TRUE will hide the MapType control (ie. Map, Satellite, Hybrid, Terrain)
+	var $disableNavigationControl	= FALSE;					// If set to TRUE will hide the Navigation control (ie. zoom in/out, pan)
+	var $disableScaleControl		= FALSE;					// If set to TRUE will hide the Scale control
+	var $disableDoubleClickZoom		= FALSE;					// If set to TRUE will disable zooming when a double click occurs
+	var $draggable					= TRUE;						// If set to FALSE will prevent the map from being dragged around
+	var $draggableCursor			= '';						// The name or url of the cursor to display on a draggable object
+	var $draggingCursor				= '';						// The name or url of the cursor to display when an object is being dragged
+	var $navigationControlPosition	= '';						// The position of the Navigation control
+	var $keyboardShortcuts			= TRUE;						// If set to FALSE will disable to map being controlled via the keyboard
+	var $jsfile						= '';						// Set this to the path of an external JS file if you wish the JavaScript to be placed in a file rather than output directly into the <head></head> section. The library will try to create the file if it does not exist already. Please ensure the destination file is writeable
+	var $map_div_id					= "map_canvas";				// The ID of the <div></div> that is output which contains the map
+	var $map_height					= "450px";					// The height of the map container. Any units (ie 'px') can be used. If no units are provided 'px' will be presumed
+	var $map_name					= "map";					// The JS reference to the map. Currently not used but to be used in the future when multiple maps are supported
+	var $map_type					= "ROADMAP";				// The default MapType
+	var $map_width					= "100%";					// The width of the map container. Any units (ie 'px') can be used. If no units are provided 'px' will be presumed
+	var $mapTypeControlPosition		= '';						// The position of the MapType control
+	var $onclick					= '';						// The JavaScript action to perform when the map is clicked
+	var $region						= '';						// Country code top-level domain (eg "uk") within which to search. Useful if supplying addresses rather than lat/longs
+	var $scaleControlPosition		= '';						// The position of the Scale control
+	var $scrollwheel				= TRUE;						// If set to FALSE will disable zooming by scrolling of the mouse wheel
+	var $sensor						= FALSE;					// Set to TRUE if being used on a device that can detect a users location
+	var	$version					= "3";						// Version of the API being used. Not currently used in the libraryh
+	var $zoom						= 13;						// The default zoom level of the map. If set to "auto" will autozoom/center to fit in all visible markers. If "auto", also overrides the $center parameter
 	
-	var	$markers					= array();	
-	var	$polylines					= array();
-	var	$polygons					= array();
-	var	$circles					= array();
+	var	$markers					= array();					// An array used by the library to store the markers as they are produced
+	var	$polylines					= array();					// An array used by the library to store the polylines as they are produced
+	var	$polygons					= array();					// An array used by the library to store the polygons as they are produced
+	var	$circles					= array();					// An array used by the library to store the circles as they are produced
 	
-	var $directions					= FALSE;
-	var $directionsStart			= "";
-	var $directionsEnd				= "";
-	var $directionsDivID			= "";
-	var $directionsMode				= "DRIVING"; // DRIVING, WALKING or BICYCLING (US Only)
-	var $directionsAvoidTolls		= FALSE;
-	var $directionsAvoidHighways	= FALSE;
+	var $directions					= FALSE;					// Whether or not the map will be used to show directions
+	var $directionsStart			= "";						// The starting location (lat/long co-ordinate or address) of the directions
+	var $directionsEnd				= "";						// The destination point (lat/long co-ordinate or address) of the directions
+	var $directionsDivID			= "";						// An element's ID on the page where textual directions will be output to. Leave blank if not required
+	var $directionsMode				= "DRIVING"; 				// DRIVING, WALKING or BICYCLING (US Only) - The vehicle/mode of transport to show directions for
+	var $directionsAvoidTolls		= FALSE;					// Whether or not directions should avoid tolls
+	var $directionsAvoidHighways	= FALSE;					// Whether or not directions should avoid highways
 	
 	function Googlemaps($config = array())
 	{
