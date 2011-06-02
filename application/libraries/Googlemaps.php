@@ -95,6 +95,7 @@ class Googlemaps {
 		$marker['draggable'] = FALSE;
 		$marker['flat'] = FALSE;
 		$marker['icon'] = '';
+		$marker['animation'] = ''; // blank, 'DROP' or 'BOUNCE'
 		$marker['onclick'] = '';
 		$marker['ondragstart'] = '';
 		$marker['ondragend'] = '';
@@ -166,6 +167,10 @@ class Googlemaps {
 		if ($marker['zIndex']!="" && is_numeric($marker['zIndex'])) {
 			$marker_output .= ',
 				zIndex: '.$marker['zIndex'];
+		}
+		if ($marker['animation']!="" && (strtoupper($marker['animation'])=="DROP" || strtoupper($marker['animation']=="BOUNCE"))) {
+			$marker_output .= ',
+				animation:  google.maps.Animation.'.strtoupper($marker['animation']);
 		}
 		$marker_output .= '		
 			});		';
