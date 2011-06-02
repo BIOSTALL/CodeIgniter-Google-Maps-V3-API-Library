@@ -97,8 +97,14 @@ class Googlemaps {
 		$marker['icon'] = '';									// The name or url of the icon to use for the marker
 		$marker['animation'] = ''; 								// blank, 'DROP' or 'BOUNCE'
 		$marker['onclick'] = '';								// JavaScript performed when a marker is clicked
+		$marker['ondrag'] = '';									// JavaScript repeatedly performed while the marker is being dragged
 		$marker['ondragstart'] = '';							// JavaScript performed when a marker is started to be dragged
 		$marker['ondragend'] = '';								// JavaScript performed when a draggable marker is dropped
+		$marker['onmousedown'] = '';							// JavaScript performed when a mousedown event occurs on a marker
+		$marker['onmouseout'] = '';								// JavaScript performed when the mouse leaves the area of the marker icon
+		$marker['onmouseover'] = '';							// JavaScript performed when the mouse enters the area of the marker icon
+		$marker['onmouseup'] = '';								// JavaScript performed when a mouseup event occurs on a marker
+		$marker['onrightclick'] = '';							// JavaScript performed when a right-click occurs on a marker
 		$marker['shadow'] = '';									// The name or url of the icon’s shadow
 		$marker['title'] = '';									// The tooltip text to show on hover
 		$marker['visible'] = TRUE;								// Defines if the marker is visible by default
@@ -198,7 +204,50 @@ class Googlemaps {
 			}
 		}
 		
+		if ($marker['onmousedown']!="") { 
+			$marker_output .= '
+			google.maps.event.addListener(marker, "mousedown", function() {
+				'.$marker['onmousedown'].'
+			});
+			';
+		}
+		if ($marker['onmouseout']!="") { 
+			$marker_output .= '
+			google.maps.event.addListener(marker, "mouseout", function() {
+				'.$marker['onmouseout'].'
+			});
+			';
+		}
+		if ($marker['onmouseover']!="") { 
+			$marker_output .= '
+			google.maps.event.addListener(marker, "mouseover", function() {
+				'.$marker['onmouseover'].'
+			});
+			';
+		}
+		if ($marker['onmouseup']!="") { 
+			$marker_output .= '
+			google.maps.event.addListener(marker, "mouseup", function() {
+				'.$marker['onmouseup'].'
+			});
+			';
+		}
+		if ($marker['onrightclick']!="") { 
+			$marker_output .= '
+			google.maps.event.addListener(marker, "rightclick", function() {
+				'.$marker['onrightclick'].'
+			});
+			';
+		}
+		
 		if ($marker['draggable']) {
+			if ($marker['ondrag']!="") { 
+				$marker_output .= '
+				google.maps.event.addListener(marker, "drag", function() {
+					'.$marker['ondrag'].'
+				});
+				';
+			}
 			if ($marker['ondragend']!="") { 
 				$marker_output .= '
 				google.maps.event.addListener(marker, "dragend", function() {
