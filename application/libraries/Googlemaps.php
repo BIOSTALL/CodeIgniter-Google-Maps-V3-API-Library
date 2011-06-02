@@ -88,21 +88,21 @@ class Googlemaps {
 		
 		$marker = array();
 		
-		$marker['position'] = '';
-		$marker['infowindow_content'] = '';
-		$marker['clickable'] = TRUE;
-		$marker['cursor'] = '';
-		$marker['draggable'] = FALSE;
-		$marker['flat'] = FALSE;
-		$marker['icon'] = '';
-		$marker['animation'] = ''; // blank, 'DROP' or 'BOUNCE'
-		$marker['onclick'] = '';
-		$marker['ondragstart'] = '';
-		$marker['ondragend'] = '';
-		$marker['shadow'] = '';
-		$marker['title'] = '';
-		$marker['visible'] = TRUE;
-		$marker['zIndex'] = '';
+		$marker['position'] = '';								// The position (lat/long co-ordinate or address) at which the marker will appear
+		$marker['infowindow_content'] = '';						// If not blank, creates an infowindow (aka bubble) with the content provided. Can be plain text or HTML
+		$marker['clickable'] = TRUE;							// Defines if the marker is clickable
+		$marker['cursor'] = '';									// The name or url of the cursor to display on hover
+		$marker['draggable'] = FALSE;							// Defines if the marker is draggable
+		$marker['flat'] = FALSE;								// If set to TRUE will not display a shadow beneath the icon
+		$marker['icon'] = '';									// The name or url of the icon to use for the marker
+		$marker['animation'] = ''; 								// blank, 'DROP' or 'BOUNCE'
+		$marker['onclick'] = '';								// JavaScript performed when a marker is clicked
+		$marker['ondragstart'] = '';							// JavaScript performed when a marker is started to be dragged
+		$marker['ondragend'] = '';								// JavaScript performed when a draggable marker is dropped
+		$marker['shadow'] = '';									// The name or url of the icon’s shadow
+		$marker['title'] = '';									// The tooltip text to show on hover
+		$marker['visible'] = TRUE;								// Defines if the marker is visible by default
+		$marker['zIndex'] = '';									// The zIndex of the marker. If two markers overlap, the marker with the higher zIndex will appear on top
 		
 		$marker_output = '';
 		
@@ -229,10 +229,10 @@ class Googlemaps {
 		
 		$polyline = array();
 		
-		$polyline['points'] = array();
-		$polyline['strokeColor'] = '#FF0000';
-		$polyline['strokeOpacity'] = '1.0';
-		$polyline['strokeWeight'] = '2';
+		$polyline['points'] = array();							// An array of latitude/longitude coordinates OR addresses, or a mixture of both. If an address is supplied the Google geocoding service will be used to return a lat/long.
+		$polyline['strokeColor'] = '#FF0000';					// The hex value of the polylines color
+		$polyline['strokeOpacity'] = '1.0';						// The opacity of the polyline. 0 to 1.0
+		$polyline['strokeWeight'] = '2';						// The thickness of the polyline
 	
 		$polyline_output = '';
 		
@@ -298,12 +298,12 @@ class Googlemaps {
 		
 		$polygon = array();
 		
-		$polygon['points'] = array();
-		$polygon['strokeColor'] = '#FF0000';
-		$polygon['strokeOpacity'] = '0.8';
-		$polygon['strokeWeight'] = '2';
-		$polygon['fillColor'] = '#FF0000';
-		$polygon['fillOpacity'] = '0.3';
+		$polygon['points'] = array();							// The positions (latitude/longitude coordinates OR addresses) at which the polygon points will appear. NOTE: The first and last elements of the array must be the same
+		$polygon['strokeColor'] = '#FF0000';					// The hex value of the polygons border color
+		$polygon['strokeOpacity'] = '0.8';						// The opacity of the polygon border. 0 to 1.0
+		$polygon['strokeWeight'] = '2';							// The thickness of the polygon border
+		$polygon['fillColor'] = '#FF0000';						// The hex value of the polygons fill color
+		$polygon['fillOpacity'] = '0.3';						// The opacity of the polygons fill
 	
 		$polygon_output = '';
 		
@@ -371,13 +371,13 @@ class Googlemaps {
 		
 		$circle = array();
 		
-		$circle['center'] = '';
-		$circle['radius'] = 0;
-		$circle['strokeColor'] = '0.8';
-		$circle['strokeOpacity'] = '0.8';
-		$circle['strokeWeight'] = '2';
-		$circle['fillColor'] = '#FF0000';
-		$circle['fillOpacity'] = '0.3';
+		$circle['center'] = '';									// The center position (latitude/longitude coordinate OR addresse) at which the circle will appear
+		$circle['radius'] = 0;									// The circle radius (in metres)
+		$circle['strokeColor'] = '0.8';							// The hex value of the circles border color
+		$circle['strokeOpacity'] = '0.8';						// The opacity of the circle border
+		$circle['strokeWeight'] = '2';							// The thickness of the circle border
+		$circle['fillColor'] = '#FF0000';						// The hex value of the circles fill color
+		$circle['fillOpacity'] = '0.3';							// The opacity of the circles fill
 	
 		$circle_output = '';
 		
