@@ -106,6 +106,7 @@ class Googlemaps {
 		$marker['onmouseover'] = '';							// JavaScript performed when the mouse enters the area of the marker icon
 		$marker['onmouseup'] = '';								// JavaScript performed when a mouseup event occurs on a marker
 		$marker['onrightclick'] = '';							// JavaScript performed when a right-click occurs on a marker
+		$marker['raiseondrag'] = TRUE;							// If FALSE, disables the raising and lowering of the icon when a marker is being dragged
 		$marker['shadow'] = '';									// The name or url of the icon’s shadow
 		$marker['title'] = '';									// The tooltip text to show on hover
 		$marker['visible'] = TRUE;								// Defines if the marker is visible by default
@@ -158,6 +159,10 @@ class Googlemaps {
 		if ($marker['icon']!="") {
 			$marker_output .= ',
 				icon: "'.$marker['icon'].'"';
+		}
+		if (!$marker['raiseondrag']) {
+			$marker_output .= ',
+				raiseOnDrag: false';
 		}
 		if ($marker['shadow']!="") {
 			$marker_output .= ',
