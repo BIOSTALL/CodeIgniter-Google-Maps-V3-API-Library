@@ -97,6 +97,7 @@ class Googlemaps {
 		$marker['icon'] = '';									// The name or url of the icon to use for the marker
 		$marker['animation'] = ''; 								// blank, 'DROP' or 'BOUNCE'
 		$marker['onclick'] = '';								// JavaScript performed when a marker is clicked
+		$marker['ondblclick'] = '';								// JavaScript performed when a marker is double-clicked
 		$marker['ondrag'] = '';									// JavaScript repeatedly performed while the marker is being dragged
 		$marker['ondragstart'] = '';							// JavaScript performed when a marker is started to be dragged
 		$marker['ondragend'] = '';								// JavaScript performed when a draggable marker is dropped
@@ -204,6 +205,13 @@ class Googlemaps {
 			}
 		}
 		
+		if ($marker['ondblclick']!="") { 
+			$marker_output .= '
+			google.maps.event.addListener(marker, "dblclick", function() {
+				'.$marker['ondblclick'].'
+			});
+			';
+		}
 		if ($marker['onmousedown']!="") { 
 			$marker_output .= '
 			google.maps.event.addListener(marker, "mousedown", function() {
