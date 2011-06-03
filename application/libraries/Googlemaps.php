@@ -581,13 +581,23 @@ class Googlemaps {
 		$circle = array();
 		
 		$circle['center'] = '';									// The center position (latitude/longitude coordinate OR addresse) at which the circle will appear
+		$circle['clickable'] = TRUE;							// Defines if the circle is clickable
 		$circle['radius'] = 0;									// The circle radius (in metres)
 		$circle['strokeColor'] = '0.8';							// The hex value of the circles border color
 		$circle['strokeOpacity'] = '0.8';						// The opacity of the circle border
 		$circle['strokeWeight'] = '2';							// The thickness of the circle border
 		$circle['fillColor'] = '#FF0000';						// The hex value of the circles fill color
 		$circle['fillOpacity'] = '0.3';							// The opacity of the circles fill
-	
+		$circle['onclick'] = '';								// JavaScript performed when a circle is clicked
+		$circle['ondblclick'] = '';								// JavaScript performed when a circle is double-clicked
+		$circle['onmousedown'] = '';							// JavaScript performed when a mousedown event occurs on a circle
+		$circle['onmousemove'] = '';							// JavaScript performed when the mouse moves in the area of the circle
+		$circle['onmouseout'] = '';								// JavaScript performed when the mouse leaves the area of the circle
+		$circle['onmouseover'] = '';							// JavaScript performed when the mouse enters the area of the circle
+		$circle['onmouseup'] = '';								// JavaScript performed when a mouseup event occurs on a circle
+		$circle['onrightclick'] = '';							// JavaScript performed when a right-click occurs on a circle
+		$circle['zIndex'] = '';									// The zIndex of the circle. If two circles overlap, the circle with the higher zIndex will appear on top
+		
 		$circle_output = '';
 		
 		foreach ($params as $key => $value) {
@@ -627,11 +637,77 @@ class Googlemaps {
 					fillOpacity: '.$circle['fillOpacity'].',
 					map: '.$this->map_name.',
 					center: circleCenter,
-					radius: '.$circle['radius'].'
+					radius: '.$circle['radius'];
+			if (!$circle['clickable']) {
+				$circle_output .= ',
+					clickable: false';
+			}
+			if ($circle['zIndex']!="" && is_numeric($circle['zIndex'])) {
+				$circle_output .= ',
+					zIndex: '.$circle['zIndex'];
+			}
+ 			$circle_output .= '
 				};
 				var circle_'.count($this->circles).' = new google.maps.Circle(circleOptions);
 			';
-		
+			
+			if ($circle['onclick']!="") { 
+				$circle_output .= '
+				google.maps.event.addListener(circle_'.count($this->circles).', "click", function() {
+					'.$circle['onclick'].'
+				});
+				';
+			}
+			if ($circle['ondblclick']!="") { 
+				$circle_output .= '
+				google.maps.event.addListener(circle_'.count($this->circles).', "dblclick", function() {
+					'.$circle['ondblclick'].'
+				});
+				';
+			}
+			if ($circle['onmousedown']!="") { 
+				$circle_output .= '
+				google.maps.event.addListener(circle_'.count($this->circles).', "mousedown", function() {
+					'.$circle['onmousedown'].'
+				});
+				';
+			}
+			if ($circle['onmousemove']!="") { 
+				$circle_output .= '
+				google.maps.event.addListener(circle_'.count($this->circles).', "mousemove", function() {
+					'.$circle['onmousemove'].'
+				});
+				';
+			}
+			if ($circle['onmouseout']!="") { 
+				$circle_output .= '
+				google.maps.event.addListener(circle_'.count($this->circles).', "mouseout", function() {
+					'.$circle['onmouseout'].'
+				});
+				';
+			}
+			if ($circle['onmouseover']!="") { 
+				$circle_output .= '
+				google.maps.event.addListener(circle_'.count($this->circles).', "mouseover", function() {
+					'.$circle['onmouseover'].'
+				});
+				';
+			}
+			if ($circle['onmouseup']!="") { 
+				$circle_output .= '
+				google.maps.event.addListener(circle_'.count($this->circles).', "mouseup", function() {
+					'.$circle['onmouseup'].'
+				});
+				';
+			}
+			if ($circle['onrightclick']!="") { 
+				$circle_output .= '
+				google.maps.event.addListener(circle_'.count($this->circles).', "rightclick", function() {
+					'.$circle['onrightclick'].'
+				});
+				';
+			}
+			
 			array_push($this->circles, $circle_output);
 			
 		}
