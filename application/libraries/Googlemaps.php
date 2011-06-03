@@ -432,12 +432,22 @@ class Googlemaps {
 		$polygon = array();
 		
 		$polygon['points'] = array();							// The positions (latitude/longitude coordinates OR addresses) at which the polygon points will appear. NOTE: The first and last elements of the array must be the same
+		$polygon['clickable'] = TRUE;							// Defines if the polygon is clickable
 		$polygon['strokeColor'] = '#FF0000';					// The hex value of the polygons border color
 		$polygon['strokeOpacity'] = '0.8';						// The opacity of the polygon border. 0 to 1.0
 		$polygon['strokeWeight'] = '2';							// The thickness of the polygon border
 		$polygon['fillColor'] = '#FF0000';						// The hex value of the polygons fill color
 		$polygon['fillOpacity'] = '0.3';						// The opacity of the polygons fill
-	
+		$polygon['onclick'] = '';								// JavaScript performed when a polygon is clicked
+		$polygon['ondblclick'] = '';							// JavaScript performed when a polygon is double-clicked
+		$polygon['onmousedown'] = '';							// JavaScript performed when a mousedown event occurs on a polygon
+		$polygon['onmousemove'] = '';							// JavaScript performed when the mouse moves in the area of the polygon
+		$polygon['onmouseout'] = '';							// JavaScript performed when the mouse leaves the area of the polygon
+		$polygon['onmouseover'] = '';							// JavaScript performed when the mouse enters the area of the polygon
+		$polygon['onmouseup'] = '';								// JavaScript performed when a mouseup event occurs on a polygon
+		$polygon['onrightclick'] = '';							// JavaScript performed when a right-click occurs on a polygon
+		$polygon['zIndex'] = '';								// The zIndex of the polygon. If two polygons overlap, the polygon with the higher zIndex will appear on top
+		
 		$polygon_output = '';
 		
 		foreach ($params as $key => $value) {
@@ -486,13 +496,79 @@ class Googlemaps {
     				strokeOpacity: '.$polygon['strokeOpacity'].',
     				strokeWeight: '.$polygon['strokeWeight'].',
 					fillColor: "'.$polygon['fillColor'].'",
-					fillOpacity: '.$polygon['fillOpacity'].'
- 				});
+					fillOpacity: '.$polygon['fillOpacity'];
+			if (!$polygon['clickable']) {
+				$polygon_output .= ',
+					clickable: false';
+			}
+			if ($polygon['zIndex']!="" && is_numeric($polygon['zIndex'])) {
+				$polygon_output .= ',
+					zIndex: '.$polygon['zIndex'];
+			}
+ 			$polygon_output .= '
+				});
 				
 				polygon_'.count($this->polygons).'.setMap('.$this->map_name.');
 
 			';
-		
+			
+			if ($polygon['onclick']!="") { 
+				$polygon_output .= '
+				google.maps.event.addListener(polygon_'.count($this->polygons).', "click", function() {
+					'.$polygon['onclick'].'
+				});
+				';
+			}
+			if ($polygon['ondblclick']!="") { 
+				$polygon_output .= '
+				google.maps.event.addListener(polygon_'.count($this->polygons).', "dblclick", function() {
+					'.$polygon['ondblclick'].'
+				});
+				';
+			}
+			if ($polygon['onmousedown']!="") { 
+				$polygon_output .= '
+				google.maps.event.addListener(polygon_'.count($this->polygons).', "mousedown", function() {
+					'.$polygon['onmousedown'].'
+				});
+				';
+			}
+			if ($polygon['onmousemove']!="") { 
+				$polygon_output .= '
+				google.maps.event.addListener(polygon_'.count($this->polygons).', "mousemove", function() {
+					'.$polygon['onmousemove'].'
+				});
+				';
+			}
+			if ($polygon['onmouseout']!="") { 
+				$polygon_output .= '
+				google.maps.event.addListener(polygon_'.count($this->polygons).', "mouseout", function() {
+					'.$polygon['onmouseout'].'
+				});
+				';
+			}
+			if ($polygon['onmouseover']!="") { 
+				$polygon_output .= '
+				google.maps.event.addListener(polygon_'.count($this->polygons).', "mouseover", function() {
+					'.$polygon['onmouseover'].'
+				});
+				';
+			}
+			if ($polygon['onmouseup']!="") { 
+				$polygon_output .= '
+				google.maps.event.addListener(polygon_'.count($this->polygons).', "mouseup", function() {
+					'.$polygon['onmouseup'].'
+				});
+				';
+			}
+			if ($polygon['onrightclick']!="") { 
+				$polygon_output .= '
+				google.maps.event.addListener(polygon_'.count($this->polygons).', "rightclick", function() {
+					'.$polygon['onrightclick'].'
+				});
+				';
+			}
+			
 			array_push($this->polygons, $polygon_output);
 			
 		}
