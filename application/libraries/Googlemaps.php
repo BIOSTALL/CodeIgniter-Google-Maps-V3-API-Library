@@ -287,10 +287,20 @@ class Googlemaps {
 		$polyline = array();
 		
 		$polyline['points'] = array();							// An array of latitude/longitude coordinates OR addresses, or a mixture of both. If an address is supplied the Google geocoding service will be used to return a lat/long.
+		$polyline['clickable'] = TRUE;							// Defines if the polyline is clickable
 		$polyline['strokeColor'] = '#FF0000';					// The hex value of the polylines color
 		$polyline['strokeOpacity'] = '1.0';						// The opacity of the polyline. 0 to 1.0
 		$polyline['strokeWeight'] = '2';						// The thickness of the polyline
-	
+		$polyline['onclick'] = '';								// JavaScript performed when a polyline is clicked
+		$polyline['ondblclick'] = '';							// JavaScript performed when a polyline is double-clicked
+		$polyline['onmousedown'] = '';							// JavaScript performed when a mousedown event occurs on a polyline
+		$polyline['onmousemove'] = '';							// JavaScript performed when the mouse moves in the area of the polyline
+		$polyline['onmouseout'] = '';							// JavaScript performed when the mouse leaves the area of the polyline
+		$polyline['onmouseover'] = '';							// JavaScript performed when the mouse enters the area of the polyline
+		$polyline['onmouseup'] = '';							// JavaScript performed when a mouseup event occurs on a polyline
+		$polyline['onrightclick'] = '';							// JavaScript performed when a right-click occurs on a polyline
+		$polyline['zIndex'] = '';								// The zIndex of the polyline. If two polylines overlap, the polyline with the higher zIndex will appear on top
+		
 		$polyline_output = '';
 		
 		foreach ($params as $key => $value) {
@@ -337,12 +347,78 @@ class Googlemaps {
     				path: polyline_plan_'.count($this->polylines).',
     				strokeColor: "'.$polyline['strokeColor'].'",
     				strokeOpacity: '.$polyline['strokeOpacity'].',
-    				strokeWeight: '.$polyline['strokeWeight'].'
- 				});
+    				strokeWeight: '.$polyline['strokeWeight'];
+			if (!$polyline['clickable']) {
+				$polyline_output .= ',
+					clickable: false';
+			}
+			if ($polyline['zIndex']!="" && is_numeric($polyline['zIndex'])) {
+				$polyline_output .= ',
+					zIndex: '.$polyline['zIndex'];
+			}
+ 			$polyline_output .= '
+				});
 				
 				polyline_'.count($this->polylines).'.setMap('.$this->map_name.');
 
 			';
+			
+			if ($polyline['onclick']!="") { 
+				$polyline_output .= '
+				google.maps.event.addListener(polyline_'.count($this->polylines).', "click", function() {
+					'.$polyline['onclick'].'
+				});
+				';
+			}
+			if ($polyline['ondblclick']!="") { 
+				$polyline_output .= '
+				google.maps.event.addListener(polyline_'.count($this->polylines).', "dblclick", function() {
+					'.$polyline['ondblclick'].'
+				});
+				';
+			}
+			if ($polyline['onmousedown']!="") { 
+				$polyline_output .= '
+				google.maps.event.addListener(polyline_'.count($this->polylines).', "mousedown", function() {
+					'.$polyline['onmousedown'].'
+				});
+				';
+			}
+			if ($polyline['onmousemove']!="") { 
+				$polyline_output .= '
+				google.maps.event.addListener(polyline_'.count($this->polylines).', "mousemove", function() {
+					'.$polyline['onmousemove'].'
+				});
+				';
+			}
+			if ($polyline['onmouseout']!="") { 
+				$polyline_output .= '
+				google.maps.event.addListener(polyline_'.count($this->polylines).', "mouseout", function() {
+					'.$polyline['onmouseout'].'
+				});
+				';
+			}
+			if ($polyline['onmouseover']!="") { 
+				$polyline_output .= '
+				google.maps.event.addListener(polyline_'.count($this->polylines).', "mouseover", function() {
+					'.$polyline['onmouseover'].'
+				});
+				';
+			}
+			if ($polyline['onmouseup']!="") { 
+				$polyline_output .= '
+				google.maps.event.addListener(polyline_'.count($this->polylines).', "mouseup", function() {
+					'.$polyline['onmouseup'].'
+				});
+				';
+			}
+			if ($polyline['onrightclick']!="") { 
+				$polyline_output .= '
+				google.maps.event.addListener(polyline_'.count($this->polylines).', "rightclick", function() {
+					'.$polyline['onrightclick'].'
+				});
+				';
+			}
 		
 			array_push($this->polylines, $polyline_output);
 			
