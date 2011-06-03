@@ -50,6 +50,7 @@ class Googlemaps {
 	var	$polylines					= array();					// An array used by the library to store the polylines as they are produced
 	var	$polygons					= array();					// An array used by the library to store the polygons as they are produced
 	var	$circles					= array();					// An array used by the library to store the circles as they are produced
+	var	$overlays					= array();					// An array used by the library to store the overlays as they are produced
 	
 	var $directions					= FALSE;					// Whether or not the map will be used to show directions
 	var $directionsStart			= "";						// The starting location (lat/long co-ordinate or address) of the directions
@@ -719,6 +720,83 @@ class Googlemaps {
 	
 	}
 	
+	function add_ground_overlay($params = array())
+	{
+		
+		$overlay = array();
+		
+		$overlay['image'] = '';									// JavaScript performed when a circle is clicked
+		$overlay['positionSW'] = '';							// The center position (latitude/longitude coordinate OR addresse) at which the circle will appear
+		$overlay['positionNE'] = '';							// The center position (latitude/longitude coordinate OR addresse) at which the circle will appear
+		$overlay['clickable'] = TRUE;							// JavaScript performed when a circle is clicked
+		$overlay['onclick'] = '';								// JavaScript performed when a circle is clicked
+		
+		$overlay_output = '';
+		
+		foreach ($params as $key => $value) {
+		
+			if (isset($overlay[$key])) {
+			
+				$overlay[$key] = $value;
+				
+			}
+			
+		}
+		
+		if ($overlay['image']!="" && $overlay['positionSW']!="" && $overlay['positionNE']!="") {
+			
+			$lat_long_to_push = '';
+			if ($this->is_lat_long($overlay['positionSW'])) {
+				$lat_long_to_push = $overlay['positionSW'];
+				$overlay_output .= '
+				var positionSW = new google.maps.LatLng('.$overlay['positionSW'].')
+				';
+			}else{
+				$lat_long = $this->get_lat_long_from_address($overlay['positionSW']);
+				$overlay_output .= '
+				var positionSW = new google.maps.LatLng('.$lat_long[0].', '.$lat_long[1].')';
+				$lat_long_to_push = $lat_long[0].', '.$lat_long[1];
+			}
+			$overlay_output .= '
+				lat_longs.push(new google.maps.LatLng('.$lat_long_to_push.'));
+			';
+			
+			$lat_long_to_push = '';
+			if ($this->is_lat_long($overlay['positionNE'])) {
+				$lat_long_to_push = $overlay['positionNE'];
+				$overlay_output .= '
+				var positionNE = new google.maps.LatLng('.$overlay['positionNE'].')
+				';
+			}else{
+				$lat_long = $this->get_lat_long_from_address($overlay['positionNE']);
+				$overlay_output .= '
+				var positionNE = new google.maps.LatLng('.$lat_long[0].', '.$lat_long[1].')';
+				$lat_long_to_push = $lat_long[0].', '.$lat_long[1];
+			}
+			$overlay_output .= '
+				lat_longs.push(new google.maps.LatLng('.$lat_long_to_push.'));
+			';
+			
+			$overlay_output .= '
+				var overlay_'.count($this->overlays).' = new google.maps.GroundOverlay("'.$overlay['image'].'", new google.maps.LatLngBounds(positionSW, positionNE), { map: '.$this->map_name;
+			if (!$overlay['clickable']) { $overlay_output .= ', clickable: false'; }
+			$overlay_output .= '});
+			';
+			
+			if ($overlay['onclick']!="") { 
+				$overlay_output .= '
+				google.maps.event.addListener(overlay_'.count($this->overlays).', "click", function() {
+					'.$overlay['onclick'].'
+				});
+				';
+			}
+			
+			array_push($this->overlays, $overlay_output);
+			
+		}
+	
+	}
+	
 	function create_map()
 	{
 	
@@ -870,6 +948,14 @@ class Googlemaps {
 		if (count($this->circles)) {
 			foreach ($this->circles as $circle) {
 				$this->output_js_contents .= $circle;
+			}
+		}	
+		//
+		
+		// add ground overlays
+		if (count($this->overlays)) {
+			foreach ($this->overlays as $overlay) {
+				$this->output_js_contents .= $overlay;
 			}
 		}	
 		//
