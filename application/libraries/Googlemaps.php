@@ -65,6 +65,14 @@ class Googlemaps {
 	var $directionsAvoidTolls		= FALSE;					// Whether or not directions should avoid tolls
 	var $directionsAvoidHighways	= FALSE;					// Whether or not directions should avoid highways
 	
+	var $places						= FALSE;					// Whether or not the map will be used to show places
+	var $placesLocation				= '';						//
+	var $placesRadius				= 0;						// 
+	var $placesLocationSW			= '';						// 
+	var $placesLocationNE			= '';						// 
+	var $placesTypes				= array();					// 
+	var $placesName					= '';						// 
+	
 	function Googlemaps($config = array())
 	{
 		if (count($config) > 0)
@@ -968,7 +976,10 @@ class Googlemaps {
 		$this->output_js .= '
 		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor='.$this->sensor;
 		if ($this->region!="" && strlen($this->region)==2) { $this->output_js .= '&region='.strtoupper($this->region); }
-		if ($this->adsense!="") { $this->output_js .= '&libraries=adsense'; }
+		$libraries = array();
+		if ($this->adsense!="") { array_push($libraries, 'adsense'); }
+		if ($this->places!="") { array_push($libraries, 'places'); }
+		if (count($libraries)) { $this->output_js .= '&libraries='.implode(",", $libraries); }
 		$this->output_js .= '"></script>';
 		if ($this->jsfile=="") {
 			$this->output_js .= '
@@ -986,6 +997,10 @@ class Googlemaps {
 		if ($this->directions) { 
 			$this->output_js_contents .= 'var directionsDisplay = new google.maps.DirectionsRenderer();
 			var directionsService = new google.maps.DirectionsService();
+			';
+		}
+		if ($this->places) {
+			$this->output_js_contents .= 'var placesService;
 			';
 		}
 		if ($this->adsense) { 
@@ -1085,6 +1100,7 @@ class Googlemaps {
 		$this->output_js_contents .= '}
 				'.$this->map_name.' = new google.maps.Map(document.getElementById("'.$this->map_div_id.'"), myOptions);
 				';
+		
 		if ($this->directions) {
 			$this->output_js_contents .= 'directionsDisplay.setMap('.$this->map_name.');
 			';
@@ -1093,6 +1109,71 @@ class Googlemaps {
 			';
 			}
 		}
+		
+		if ($this->places) {
+			
+			$placesLocationSet = false;
+			
+			if ($this->placesLocationSW!="" && $this->placesLocationNE!="") { // if search based on bounds
+			
+				$placesLocationSet = true;
+				
+				if ($this->is_lat_long($this->placesLocationSW)) {
+					$this->output_js_contents .= 'var placesLocationSW = new google.maps.LatLng('.$this->placesLocationSW.');
+			';
+				}else{  // if centering the map on an address
+					$lat_long = $this->get_lat_long_from_address($this->placesLocationSW);
+					$this->output_js_contents .= 'var placesLocationSW = new google.maps.LatLng('.$lat_long[0].', '.$lat_long[1].');
+			';
+				}
+				
+				if ($this->is_lat_long($this->placesLocationNE)) {
+					$this->output_js_contents .= 'var placesLocationNE = new google.maps.LatLng('.$this->placesLocationNE.');
+			';
+				}else{  // if centering the map on an address
+					$lat_long = $this->get_lat_long_from_address($this->placesLocationNE);
+					$this->output_js_contents .= 'var placesLocationNE = new google.maps.LatLng('.$lat_long[0].', '.$lat_long[1].');
+			';
+				}
+				
+			}
+			
+			$this->output_js_contents .= 'var placesRequest = {
+				';
+			if ($placesLocationSet) {
+				$this->output_js_contents .= 'bounds: new google.maps.LatLngBounds(placesLocationSW, placesLocationNE)
+					';
+			}else{
+				if ($this->placesLocation!="") { // if search based on a center point
+					if ($this->is_lat_long($this->placesLocation)) { // if centering the map on a lat/long
+						$this->output_js_contents .= 'location: new google.maps.LatLng('.$this->placesLocation.')
+					';
+					}else{  // if centering the map on an address
+						$lat_long = $this->get_lat_long_from_address($this->placesLocation);
+						$this->output_js_contents .= 'location: new google.maps.LatLng('.$lat_long[0].', '.$lat_long[1].')
+					';
+					}
+					$this->output_js_contents .= ',radius: '.$this->placesRadius.'
+					';
+				}
+			}
+			
+			if (count($this->placesTypes)) {
+				$this->output_js_contents .= ',types: [\''.implode("','", $this->placesTypes).'\']
+					';
+			}
+			if ($this->placesName!="") {
+				$this->output_js_contents .= ',name : \''.$this->placesName.'\'
+					';
+			}
+			$this->output_js_contents .= '};
+			
+			placesService = new google.maps.places.PlacesService('.$this->map_name.');
+			placesService.search(placesRequest, placesCallback);
+			';
+			
+		}
+		
 		if ($this->onclick!="") { 
 			$this->output_js_contents .= 'google.maps.event.addListener(map, "click", function(event) {
     			'.$this->onclick.'
@@ -1149,15 +1230,11 @@ class Googlemaps {
 		//
 		
 		if ($this->zoom=="auto") { 
+			
 			$this->output_js_contents .= '
-			var bounds = new google.maps.LatLngBounds();
-			if (lat_longs.length>0) {
-				for (var i=0; i<lat_longs.length; i++) {
-					bounds.extend(lat_longs[i]);
-				}
-				'.$this->map_name.'.fitBounds(bounds);
-			}
+			fitMapToBounds();
 			';
+			
 		}
 		
 		if ($this->adsense) { 
@@ -1233,6 +1310,50 @@ class Googlemaps {
 			}
 			';
 			
+		}
+		
+		if ($this->places) {
+			$this->output_js_contents .= 'function placesCallback(results, status) {
+				if (status == google.maps.places.PlacesServiceStatus.OK) {
+					for (var i = 0; i < results.length; i++) {
+						
+						var place = results[i];
+					
+						var placeLoc = place.geometry.location;
+						var placePosition = new google.maps.LatLng(placeLoc.lat(), placeLoc.lng());
+						var marker = new google.maps.Marker({
+				 			map: '.$this->map_name.',
+				        	position: placePosition
+				      	});
+				      	marker.set("content", place.name);
+				      	google.maps.event.addListener(marker, "click", function() {
+				        	iw.setContent(this.get("content"));
+				        	iw.open('.$this->map_name.', this);
+				      	});
+				      	
+				      	lat_longs.push(placePosition);
+					
+					}
+					';
+			if ($this->zoom=="auto") { $this->output_js_contents .= 'fitMapToBounds();'; }
+			$this->output_js_contents .= '
+				}
+			}
+			';
+		}
+		
+		if ($this->zoom=="auto") {
+			$this->output_js_contents .= '
+			function fitMapToBounds() {
+				var bounds = new google.maps.LatLngBounds();
+				if (lat_longs.length>0) {
+					for (var i=0; i<lat_longs.length; i++) {
+						bounds.extend(lat_longs[i]);
+					}
+					'.$this->map_name.'.fitBounds(bounds);
+				}
+			}
+			';
 		}
 		
 		$this->output_js_contents .= '
