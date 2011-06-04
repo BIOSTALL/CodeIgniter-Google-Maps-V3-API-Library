@@ -66,12 +66,12 @@ class Googlemaps {
 	var $directionsAvoidHighways	= FALSE;					// Whether or not directions should avoid highways
 	
 	var $places						= FALSE;					// Whether or not the map will be used to show places
-	var $placesLocation				= '';						//
-	var $placesRadius				= 0;						// 
-	var $placesLocationSW			= '';						// 
-	var $placesLocationNE			= '';						// 
-	var $placesTypes				= array();					// 
-	var $placesName					= '';						// 
+	var $placesLocation				= '';						// A point (lat/long co-ordinate or address) on the map if the search for places is based around a central point
+	var $placesRadius				= 0;						// The radius (in meters) if search is based around a central position
+	var $placesLocationSW			= '';						// If preferring to search within bounds the South-West position (latitude/longitude coordinate OR address)
+	var $placesLocationNE			= '';						// If preferring to search within bounds the North-East position (latitude/longitude coordinate OR address)
+	var $placesTypes				= array();					// The types of places to search for. For a list of supported types see http://code.google.com/apis/maps/documentation/places/supported_types.html
+	var $placesName					= '';						// A term to be matched against when searching for places to display on the map
 	
 	function Googlemaps($config = array())
 	{
@@ -738,8 +738,8 @@ class Googlemaps {
 		
 		$rectangle = array();
 		
-		$rectangle['positionSW'] = '';							// The center position (latitude/longitude coordinate OR address) at which the rectangle will appear
-		$rectangle['positionNE'] = '';							// The center position (latitude/longitude coordinate OR address) at which the rectangle will appear
+		$rectangle['positionSW'] = '';							// The South-West position (latitude/longitude coordinate OR address) at which the rectangle will appear
+		$rectangle['positionNE'] = '';							// The North-East position(latitude/longitude coordinate OR address) at which the rectangle will appear
 		$rectangle['clickable'] = TRUE;							// Defines if the rectangle is clickable
 		$rectangle['strokeColor'] = '0.8';						// The hex value of the rectangles border color
 		$rectangle['strokeOpacity'] = '0.8';					// The opacity of the rectangle border
