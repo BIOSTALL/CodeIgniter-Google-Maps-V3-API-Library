@@ -886,11 +886,11 @@ class Googlemaps {
 		
 		$overlay = array();
 		
-		$overlay['image'] = '';									// JavaScript performed when a circle is clicked
-		$overlay['positionSW'] = '';							// The center position (latitude/longitude coordinate OR addresse) at which the circle will appear
-		$overlay['positionNE'] = '';							// The center position (latitude/longitude coordinate OR addresse) at which the circle will appear
-		$overlay['clickable'] = TRUE;							// JavaScript performed when a circle is clicked
-		$overlay['onclick'] = '';								// JavaScript performed when a circle is clicked
+		$overlay['image'] = '';									// JavaScript performed when a ground overlay is clicked
+		$overlay['positionSW'] = '';							// The South-West position (latitude/longitude coordinate OR addresse) at which the ground overlay will appear
+		$overlay['positionNE'] = '';							// The North-East position (latitude/longitude coordinate OR addresse) at which the ground overlay will appear
+		$overlay['clickable'] = TRUE;							// Defines if the ground overlay is clickable
+		$overlay['onclick'] = '';								// JavaScript performed when a ground overlay is clicked
 		
 		$overlay_output = '';
 		
