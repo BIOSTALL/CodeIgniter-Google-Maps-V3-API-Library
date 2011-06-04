@@ -29,7 +29,7 @@ class Googlemaps {
 	var $draggable					= TRUE;						// If set to FALSE will prevent the map from being dragged around
 	var $draggableCursor			= '';						// The name or url of the cursor to display on a draggable object
 	var $draggingCursor				= '';						// The name or url of the cursor to display when an object is being dragged
-	var $navigationControlPosition	= '';						// The position of the Navigation control
+	var $navigationControlPosition	= '';						// The position of the Navigation control, eg. 'BOTTOM_RIGHT'
 	var $keyboardShortcuts			= TRUE;						// If set to FALSE will disable to map being controlled via the keyboard
 	var $jsfile						= '';						// Set this to the path of an external JS file if you wish the JavaScript to be placed in a file rather than output directly into the <head></head> section. The library will try to create the file if it does not exist already. Please ensure the destination file is writeable
 	var $map_div_id					= "map_canvas";				// The ID of the <div></div> that is output which contains the map
@@ -37,14 +37,17 @@ class Googlemaps {
 	var $map_name					= "map";					// The JS reference to the map. Currently not used but to be used in the future when multiple maps are supported
 	var $map_type					= "ROADMAP";				// The default MapType
 	var $map_width					= "100%";					// The width of the map container. Any units (ie 'px') can be used. If no units are provided 'px' will be presumed
-	var $mapTypeControlPosition		= '';						// The position of the MapType control
+	var $mapTypeControlPosition		= '';						// The position of the MapType control, eg. 'BOTTOM_RIGHT'
+	var $mapTypeControlStyle		= '';						// The style of the MapType control. blank, 'DROPDOWN_MENU' or 'HORIZONTAL_BAR' values accepted.
 	var $onclick					= '';						// The JavaScript action to perform when the map is clicked
 	var $region						= '';						// Country code top-level domain (eg "uk") within which to search. Useful if supplying addresses rather than lat/longs
-	var $scaleControlPosition		= '';						// The position of the Scale control
+	var $scaleControlPosition		= '';						// The position of the Scale control, eg. 'BOTTOM_RIGHT'
 	var $scrollwheel				= TRUE;						// If set to FALSE will disable zooming by scrolling of the mouse wheel
 	var $sensor						= FALSE;					// Set to TRUE if being used on a device that can detect a users location
 	var	$version					= "3";						// Version of the API being used. Not currently used in the libraryh
 	var $zoom						= 13;						// The default zoom level of the map. If set to "auto" will autozoom/center to fit in all visible markers. If "auto", also overrides the $center parameter
+	var $zoomControlPosition		= '';						// The position of the Zoom control, eg. 'BOTTOM_RIGHT'
+	var $zoomControlStyle			= '';						// The size of the zoom control. blank, 'SMALL' or 'LARGE' values accepted.
 	
 	var	$markers					= array();					// An array used by the library to store the markers as they are produced
 	var	$polylines					= array();					// An array used by the library to store the polylines as they are produced
@@ -886,9 +889,16 @@ class Googlemaps {
 			$this->output_js_contents .= ',
 					keyboardShortcuts: false';
 		}
+		$mapTypeControlOptions = array();
 		if ($this->mapTypeControlPosition!="") {
+			array_push($mapTypeControlOptions, 'position: google.maps.ControlPosition.'.strtoupper($this->mapTypeControlPosition));
+		}
+		if ($this->mapTypeControlStyle!="" && (strtoupper($this->mapTypeControlStyle)=="DROPDOWN_MENU" || strtoupper($this->mapTypeControlStyle)=="HORIZONTAL_BAR")) {
+			array_push($mapTypeControlOptions, 'style: google.maps.MapTypeControlStyle.'.strtoupper($this->mapTypeControlStyle));
+		}
+		if (count($mapTypeControlOptions)) {
 			$this->output_js_contents .= ',
-					mapTypeControlOptions: {position: google.maps.ControlPosition.'.strtoupper($this->mapTypeControlPosition).'}';
+						mapTypeControlOptions: {'.implode(",", $mapTypeControlOptions).'}';
 		}
 		if ($this->navigationControlPosition!="") {
 			$this->output_js_contents .= ',
@@ -901,6 +911,13 @@ class Googlemaps {
 		if (!$this->scrollwheel) {
 			$this->output_js_contents .= ',
 					scrollwheel: false';
+		}
+		$zoomControlOptions = array();
+		if ($this->zoomControlPosition!="") { array_push($zoomControlOptions, 'position: google.maps.ControlPosition.'.strtoupper($this->zoomControlPosition)); }
+		if ($this->zoomControlStyle!="" && (strtoupper($this->zoomControlStyle)=="SMALL" || strtoupper($this->zoomControlStyle)=="LARGE")) { array_push($zoomControlOptions, 'style: google.maps.ZoomControlStyle.'.strtoupper($this->zoomControlStyle)); }
+		if (count($zoomControlOptions)) {
+			$this->output_js_contents .= ',
+					zoomControlOptions: {'.implode(",", $zoomControlOptions).'}';
 		}
 		$this->output_js_contents .= '}
 				'.$this->map_name.' = new google.maps.Map(document.getElementById("'.$this->map_div_id.'"), myOptions);
