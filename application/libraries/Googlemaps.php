@@ -35,7 +35,8 @@ class Googlemaps {
 	var $map_div_id					= "map_canvas";				// The ID of the <div></div> that is output which contains the map
 	var $map_height					= "450px";					// The height of the map container. Any units (ie 'px') can be used. If no units are provided 'px' will be presumed
 	var $map_name					= "map";					// The JS reference to the map. Currently not used but to be used in the future when multiple maps are supported
-	var $map_type					= "ROADMAP";				// The default MapType
+	var $map_type					= "ROADMAP";				// The default MapType. Values accepted are 'HYBRID', 'ROADMAP', 'SATELLITE' or 'TERRAIN'
+	var $map_types_available		= array();					// The other MapTypes available for selection on the map
 	var $map_width					= "100%";					// The width of the map container. Any units (ie 'px') can be used. If no units are provided 'px' will be presumed
 	var $mapTypeControlPosition		= '';						// The position of the MapType control, eg. 'BOTTOM_RIGHT'
 	var $mapTypeControlStyle		= '';						// The style of the MapType control. blank, 'DROPDOWN_MENU' or 'HORIZONTAL_BAR' values accepted.
@@ -895,6 +896,11 @@ class Googlemaps {
 		}
 		if ($this->mapTypeControlStyle!="" && (strtoupper($this->mapTypeControlStyle)=="DROPDOWN_MENU" || strtoupper($this->mapTypeControlStyle)=="HORIZONTAL_BAR")) {
 			array_push($mapTypeControlOptions, 'style: google.maps.MapTypeControlStyle.'.strtoupper($this->mapTypeControlStyle));
+		}
+		if (count($this->map_types_available)) {
+			$map_types = array();
+			foreach ($this->map_types_available as $map_type) { array_push($map_types, 'google.maps.MapTypeId.'.strtoupper($map_type)); }
+			array_push($mapTypeControlOptions, 'mapTypeIds: ['.implode(", ", $map_types).']');
 		}
 		if (count($mapTypeControlOptions)) {
 			$this->output_js_contents .= ',
