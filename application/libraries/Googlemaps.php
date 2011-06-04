@@ -54,6 +54,7 @@ class Googlemaps {
 	var	$polylines					= array();					// An array used by the library to store the polylines as they are produced
 	var	$polygons					= array();					// An array used by the library to store the polygons as they are produced
 	var	$circles					= array();					// An array used by the library to store the circles as they are produced
+	var	$rectangles					= array();					// An array used by the library to store the rectangles as they are produced
 	var	$overlays					= array();					// An array used by the library to store the overlays as they are produced
 	
 	var $directions					= FALSE;					// Whether or not the map will be used to show directions
@@ -724,6 +725,162 @@ class Googlemaps {
 	
 	}
 	
+	function add_rectangle($params = array())
+	{
+		
+		$rectangle = array();
+		
+		$rectangle['positionSW'] = '';							// The center position (latitude/longitude coordinate OR address) at which the rectangle will appear
+		$rectangle['positionNE'] = '';							// The center position (latitude/longitude coordinate OR address) at which the rectangle will appear
+		$rectangle['clickable'] = TRUE;							// Defines if the rectangle is clickable
+		$rectangle['strokeColor'] = '0.8';						// The hex value of the rectangles border color
+		$rectangle['strokeOpacity'] = '0.8';					// The opacity of the rectangle border
+		$rectangle['strokeWeight'] = '2';						// The thickness of the rectangle border
+		$rectangle['fillColor'] = '#FF0000';					// The hex value of the rectangles fill color
+		$rectangle['fillOpacity'] = '0.3';						// The opacity of the rectangles fill
+		$rectangle['onclick'] = '';								// JavaScript performed when a rectangle is clicked
+		$rectangle['ondblclick'] = '';							// JavaScript performed when a rectangle is double-clicked
+		$rectangle['onmousedown'] = '';							// JavaScript performed when a mousedown event occurs on a rectangle
+		$rectangle['onmousemove'] = '';							// JavaScript performed when the mouse moves in the area of the rectangle
+		$rectangle['onmouseout'] = '';							// JavaScript performed when the mouse leaves the area of the rectangle
+		$rectangle['onmouseover'] = '';							// JavaScript performed when the mouse enters the area of the rectangle
+		$rectangle['onmouseup'] = '';							// JavaScript performed when a mouseup event occurs on a rectangle
+		$rectangle['onrightclick'] = '';						// JavaScript performed when a right-click occurs on a rectangle
+		$rectangle['zIndex'] = '';								// The zIndex of the rectangle. If two rectangles overlap, the rectangle with the higher zIndex will appear on top
+		
+		$rectangle_output = '';
+		
+		foreach ($params as $key => $value) {
+		
+			if (isset($rectangle[$key])) {
+			
+				$rectangle[$key] = $value;
+				
+			}
+			
+		}
+		
+		if ($rectangle['positionSW']!="" && $rectangle['positionNE']!="") {
+			
+			$lat_long_to_push = '';
+			if ($this->is_lat_long($rectangle['positionSW'])) {
+				$lat_long_to_push = $rectangle['positionSW'];
+				$rectangle_output .= '
+				var positionSW = new google.maps.LatLng('.$rectangle['positionSW'].')
+				';
+			}else{
+				$lat_long = $this->get_lat_long_from_address($rectangle['positionSW']);
+				$rectangle_output .= '
+				var positionSW = new google.maps.LatLng('.$lat_long[0].', '.$lat_long[1].')';
+				$lat_long_to_push = $lat_long[0].', '.$lat_long[1];
+			}
+			$rectangle_output .= '
+				lat_longs.push(new google.maps.LatLng('.$lat_long_to_push.'));
+			';
+			
+			$lat_long_to_push = '';
+			if ($this->is_lat_long($rectangle['positionNE'])) {
+				$lat_long_to_push = $rectangle['positionNE'];
+				$rectangle_output .= '
+				var positionNE = new google.maps.LatLng('.$rectangle['positionNE'].')
+				';
+			}else{
+				$lat_long = $this->get_lat_long_from_address($rectangle['positionNE']);
+				$rectangle_output .= '
+				var positionNE = new google.maps.LatLng('.$lat_long[0].', '.$lat_long[1].')';
+				$lat_long_to_push = $lat_long[0].', '.$lat_long[1];
+			}
+			$rectangle_output .= '
+				lat_longs.push(new google.maps.LatLng('.$lat_long_to_push.'));
+			';
+			
+			$rectangle_output .= '
+				var rectangleOptions = {
+					strokeColor: "'.$rectangle['strokeColor'].'",
+					strokeOpacity: '.$rectangle['strokeOpacity'].',
+					strokeWeight: '.$rectangle['strokeWeight'].',
+					fillColor: "'.$rectangle['fillColor'].'",
+					fillOpacity: '.$rectangle['fillOpacity'].',
+					map: '.$this->map_name.',
+					bounds: new google.maps.LatLngBounds(positionSW, positionNE)';
+			if (!$rectangle['clickable']) {
+				$rectangle_output .= ',
+					clickable: false';
+			}
+			if ($rectangle['zIndex']!="" && is_numeric($rectangle['zIndex'])) {
+				$rectangle_output .= ',
+					zIndex: '.$rectangle['zIndex'];
+			}
+ 			$rectangle_output .= '
+				};';
+			
+			$rectangle_output .= '
+				var rectangle_'.count($this->rectangles).' = new google.maps.Rectangle(rectangleOptions);
+			';
+			
+			if ($rectangle['onclick']!="") { 
+				$rectangle_output .= '
+				google.maps.event.addListener(rectangle_'.count($this->rectangles).', "click", function() {
+					'.$rectangle['onclick'].'
+				});
+				';
+			}
+			if ($rectangle['ondblclick']!="") { 
+				$rectangle_output .= '
+				google.maps.event.addListener(rectangle_'.count($this->rectangles).', "dblclick", function() {
+					'.$rectangle['ondblclick'].'
+				});
+				';
+			}
+			if ($rectangle['onmousedown']!="") { 
+				$rectangle_output .= '
+				google.maps.event.addListener(rectangle_'.count($this->rectangles).', "mousedown", function() {
+					'.$rectangle['onmousedown'].'
+				});
+				';
+			}
+			if ($rectangle['onmousemove']!="") { 
+				$rectangle_output .= '
+				google.maps.event.addListener(rectangle_'.count($this->rectangles).', "mousemove", function() {
+					'.$rectangle['onmousemove'].'
+				});
+				';
+			}
+			if ($rectangle['onmouseout']!="") { 
+				$rectangle_output .= '
+				google.maps.event.addListener(rectangle_'.count($this->rectangles).', "mouseout", function() {
+					'.$rectangle['onmouseout'].'
+				});
+				';
+			}
+			if ($rectangle['onmouseover']!="") { 
+				$rectangle_output .= '
+				google.maps.event.addListener(rectangle_'.count($this->rectangles).', "mouseover", function() {
+					'.$rectangle['onmouseover'].'
+				});
+				';
+			}
+			if ($rectangle['onmouseup']!="") { 
+				$rectangle_output .= '
+				google.maps.event.addListener(rectangle_'.count($this->rectangles).', "mouseup", function() {
+					'.$rectangle['onmouseup'].'
+				});
+				';
+			}
+			if ($rectangle['onrightclick']!="") { 
+				$rectangle_output .= '
+				google.maps.event.addListener(rectangle_'.count($this->rectangles).', "rightclick", function() {
+					'.$rectangle['onrightclick'].'
+				});
+				';
+			}
+			
+			array_push($this->rectangles, $rectangle_output);
+			
+		}
+	
+	}
+	
 	function add_ground_overlay($params = array())
 	{
 		
@@ -971,6 +1128,14 @@ class Googlemaps {
 		if (count($this->circles)) {
 			foreach ($this->circles as $circle) {
 				$this->output_js_contents .= $circle;
+			}
+		}	
+		//
+		
+		// add rectangles
+		if (count($this->rectangles)) {
+			foreach ($this->rectangles as $rectangle) {
+				$this->output_js_contents .= $rectangle;
 			}
 		}	
 		//
