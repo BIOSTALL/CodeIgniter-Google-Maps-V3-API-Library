@@ -20,12 +20,14 @@ class Googlemaps {
 	var $adsenseFormat				= 'HALF_BANNER';			// The format of the AdUnit
 	var $adsensePosition			= 'TOP_CENTER';				// The position of the AdUnit
 	var $adsensePublisherID			= '';						// Your Google AdSense publisher ID
+	var $backgroundColor			= '';						// A hex color value shown as the map background when tiles have not yet loaded as the user pans
 	var $center						= "37.4419, -122.1419";		// Sets the default center location (lat/long co-ordinate or address) of the map
 	var $disableDefaultUI			= FALSE;					// If set to TRUE will hide the default controls (ie. zoom, scale etc)
+	var $disableDoubleClickZoom		= FALSE;					// If set to TRUE will disable zooming when a double click occurs
 	var $disableMapTypeControl		= FALSE;					// If set to TRUE will hide the MapType control (ie. Map, Satellite, Hybrid, Terrain)
 	var $disableNavigationControl	= FALSE;					// If set to TRUE will hide the Navigation control (ie. zoom in/out, pan)
 	var $disableScaleControl		= FALSE;					// If set to TRUE will hide the Scale control
-	var $disableDoubleClickZoom		= FALSE;					// If set to TRUE will disable zooming when a double click occurs
+	var $disableStreetViewControl	= FALSE;					// If set to TRUE will hide the Street View control
 	var $draggable					= TRUE;						// If set to FALSE will prevent the map from being dragged around
 	var $draggableCursor			= '';						// The name or url of the cursor to display on a draggable object
 	var $draggingCursor				= '';						// The name or url of the cursor to display when an object is being dragged
@@ -40,11 +42,14 @@ class Googlemaps {
 	var $map_width					= "100%";					// The width of the map container. Any units (ie 'px') can be used. If no units are provided 'px' will be presumed
 	var $mapTypeControlPosition		= '';						// The position of the MapType control, eg. 'BOTTOM_RIGHT'
 	var $mapTypeControlStyle		= '';						// The style of the MapType control. blank, 'DROPDOWN_MENU' or 'HORIZONTAL_BAR' values accepted.
+	var $minzoom					= '';						// The minimum zoom level which will be displayed on the map
+	var $maxzoom					= '';						// The maximum zoom level which will be displayed on the map
 	var $onclick					= '';						// The JavaScript action to perform when the map is clicked
 	var $region						= '';						// Country code top-level domain (eg "uk") within which to search. Useful if supplying addresses rather than lat/longs
 	var $scaleControlPosition		= '';						// The position of the Scale control, eg. 'BOTTOM_RIGHT'
 	var $scrollwheel				= TRUE;						// If set to FALSE will disable zooming by scrolling of the mouse wheel
 	var $sensor						= FALSE;					// Set to TRUE if being used on a device that can detect a users location
+	var $streetViewControlPosition	= '';						// The position of the Zoom control, eg. 'BOTTOM_RIGHT'
 	var	$tilt						= 0;						// The angle of tilt. Currently only supports the values 0 and 45 in SATELLITE and HYBRID map types and at certain zoom levels
 	var	$version					= "3";						// Version of the API being used. Not currently used in the library
 	var $zoom						= 13;						// The default zoom level of the map. If set to "auto" will autozoom/center to fit in all visible markers. If "auto", also overrides the $center parameter
@@ -1027,6 +1032,10 @@ class Googlemaps {
 		$this->output_js_contents .= '
 					center: myLatlng,
 			  		mapTypeId: google.maps.MapTypeId.'.$this->map_type;
+		if ($this->backgroundColor) {
+			$this->output_js_contents .= ',
+					backgroundColor: \''.$this->backgroundColor.'\'';
+		}
 		if ($this->disableDefaultUI) {
 			$this->output_js_contents .= ',
 					disableDefaultUI: true';
@@ -1042,6 +1051,10 @@ class Googlemaps {
 		if ($this->disableScaleControl) {
 			$this->output_js_contents .= ',
 					scaleControl: false';
+		}
+		if ($this->disableStreetViewControl) {
+			$this->output_js_contents .= ',
+					streetViewControl: false';
 		}
 		if ($this->disableDoubleClickZoom) {
 			$this->output_js_contents .= ',
@@ -1079,6 +1092,14 @@ class Googlemaps {
 			$this->output_js_contents .= ',
 						mapTypeControlOptions: {'.implode(",", $mapTypeControlOptions).'}';
 		}
+		if ($this->minzoom!="") {
+			$this->output_js_contents .= ',
+					minZoom: '.$this->minzoom;
+		}
+		if ($this->maxzoom!="") {
+			$this->output_js_contents .= ',
+					maxZoom: '.$this->maxzoom;
+		}
 		if ($this->navigationControlPosition!="") {
 			$this->output_js_contents .= ',
 					navigationControlOptions: {position: google.maps.ControlPosition.'.strtoupper($this->navigationControlPosition).'}';
@@ -1090,6 +1111,10 @@ class Googlemaps {
 		if (!$this->scrollwheel) {
 			$this->output_js_contents .= ',
 					scrollwheel: false';
+		}
+		if ($this->streetViewControlPosition!="") {
+			$this->output_js_contents .= ',
+					streetViewControlOptions: {position: google.maps.ControlPosition.'.strtoupper($this->streetViewControlPosition).'}';
 		}
 		if ($this->tilt==45) {
 			$this->output_js_contents .= ',
