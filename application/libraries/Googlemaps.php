@@ -45,7 +45,8 @@ class Googlemaps {
 	var $scaleControlPosition		= '';						// The position of the Scale control, eg. 'BOTTOM_RIGHT'
 	var $scrollwheel				= TRUE;						// If set to FALSE will disable zooming by scrolling of the mouse wheel
 	var $sensor						= FALSE;					// Set to TRUE if being used on a device that can detect a users location
-	var	$version					= "3";						// Version of the API being used. Not currently used in the libraryh
+	var	$tilt						= 0;						// The angle of tilt. Currently only supports the values 0 and 45 in SATELLITE and HYBRID map types and at certain zoom levels
+	var	$version					= "3";						// Version of the API being used. Not currently used in the library
 	var $zoom						= 13;						// The default zoom level of the map. If set to "auto" will autozoom/center to fit in all visible markers. If "auto", also overrides the $center parameter
 	var $zoomControlPosition		= '';						// The position of the Zoom control, eg. 'BOTTOM_RIGHT'
 	var $zoomControlStyle			= '';						// The size of the zoom control. blank, 'SMALL' or 'LARGE' values accepted.
@@ -1089,6 +1090,10 @@ class Googlemaps {
 		if (!$this->scrollwheel) {
 			$this->output_js_contents .= ',
 					scrollwheel: false';
+		}
+		if ($this->tilt==45) {
+			$this->output_js_contents .= ',
+					tilt: '.$this->tilt;
 		}
 		$zoomControlOptions = array();
 		if ($this->zoomControlPosition!="") { array_push($zoomControlOptions, 'position: google.maps.ControlPosition.'.strtoupper($this->zoomControlPosition)); }
