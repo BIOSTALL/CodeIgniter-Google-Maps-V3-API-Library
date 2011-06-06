@@ -1297,16 +1297,14 @@ class Googlemaps {
 		';
 		
 		// add markers
-		if (count($this->markers) || $this->places) {
-			$this->output_js_contents .= '
-			function createMarker(markerOptions) {
-				var marker = new google.maps.Marker(markerOptions);
-				markers.push(marker);
-				lat_longs.push(marker.getPosition());
-				return marker;
-			}
-			';
-		}	
+		$this->output_js_contents .= '
+		function createMarker(markerOptions) {
+			var marker = new google.maps.Marker(markerOptions);
+			markers.push(marker);
+			lat_longs.push(marker.getPosition());
+			return marker;
+		}
+		';
 		//
 		
 		if ($this->directions) {
