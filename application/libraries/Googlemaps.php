@@ -156,8 +156,8 @@ class Googlemaps {
 			}
 		}
 		
-		$marker_output .= '		
-			var marker = new google.maps.Marker({
+		$marker_output .= '	
+			var markerOptions = {
 				position: myLatlng, 
 				map: '.$this->map_name;
 		if (!$marker['clickable']) {
@@ -205,7 +205,9 @@ class Googlemaps {
 				animation:  google.maps.Animation.'.strtoupper($marker['animation']);
 		}
 		$marker_output .= '		
-			});		';
+			};
+			marker = createMarker(markerOptions);
+			';
 		
 		if ($marker['infowindow_content']!="") {
 			$marker_output .= '
@@ -218,7 +220,7 @@ class Googlemaps {
 			if ($marker['onclick']!="") { $marker_output .= $marker['onclick'].'
 			'; }
 			$marker_output .= '
-			});
+			};
 			';
 		}else{
 			if ($marker['onclick']!="") { 
@@ -296,11 +298,6 @@ class Googlemaps {
 				';
 			}
 		}
-		
-		$marker_output .= '
-			markers.push(marker);
-			lat_longs.push(marker.getPosition());
-		';
 		
 		array_push($this->markers, $marker_output);
 	
@@ -1299,6 +1296,19 @@ class Googlemaps {
 		
 		';
 		
+		// add markers
+		if (count($this->markers) || $this->places) {
+			$this->output_js_contents .= '
+			function createMarker(markerOptions) {
+				var marker = new google.maps.Marker(markerOptions);
+				markers.push(marker);
+				lat_longs.push(marker.getPosition());
+				return marker;
+			}
+			';
+		}	
+		//
+		
 		if ($this->directions) {
 			
 			$this->output_js_contents .= 'function calcRoute(start, end) {
@@ -1351,10 +1361,11 @@ class Googlemaps {
 					
 						var placeLoc = place.geometry.location;
 						var placePosition = new google.maps.LatLng(placeLoc.lat(), placeLoc.lng());
-						var marker = new google.maps.Marker({
+						var markerOptions = {
 				 			map: '.$this->map_name.',
 				        	position: placePosition
-				      	});
+				      	};
+				      	var marker = createMarker(markerOptions);
 				      	marker.set("content", place.name);
 				      	google.maps.event.addListener(marker, "click", function() {
 				        	iw.setContent(this.get("content"));
