@@ -21,7 +21,7 @@ class Googlemaps {
 	var $adsensePosition			= 'TOP_CENTER';				// The position of the AdUnit
 	var $adsensePublisherID			= '';						// Your Google AdSense publisher ID
 	var $backgroundColor			= '';						// A hex color value shown as the map background when tiles have not yet loaded as the user pans
-	var $center						= "37.4419, -122.1419";		// Sets the default center location (lat/long co-ordinate or address) of the map
+	var $center						= "37.4419, -122.1419";		// Sets the default center location (lat/long co-ordinate or address) of the map. If defaulting to the users location set to "auto"
 	var $disableDefaultUI			= FALSE;					// If set to TRUE will hide the default controls (ie. zoom, scale etc)
 	var $disableDoubleClickZoom		= FALSE;					// If set to TRUE will disable zooming when a double click occurs
 	var $disableMapTypeControl		= FALSE;					// If set to TRUE will hide the MapType control (ie. Map, Satellite, Hybrid, Terrain)
@@ -984,6 +984,9 @@ class Googlemaps {
 		if ($this->places!="") { array_push($libraries, 'places'); }
 		if (count($libraries)) { $this->output_js .= '&libraries='.implode(",", $libraries); }
 		$this->output_js .= '"></script>';
+		if ($this->center=="auto") { $this->output_js .= '
+		<script type="text/javascript" src="http://code.google.com/apis/gears/gears_init.js"></script>
+		'; }
 		if ($this->jsfile=="") {
 			$this->output_js .= '
 			<script type="text/javascript">
@@ -1014,20 +1017,23 @@ class Googlemaps {
 		$this->output_js_contents .= 'function initialize() {
 				
 				';
-				
-		if ($this->is_lat_long($this->center)) { // if centering the map on a lat/long
-			$this->output_js_contents .= 'var myLatlng = new google.maps.LatLng('.$this->center.');';
-		}else{  // if centering the map on an address
-			$lat_long = $this->get_lat_long_from_address($this->center);
-			$this->output_js_contents .= 'var myLatlng = new google.maps.LatLng('.$lat_long[0].', '.$lat_long[1].');';
+
+		if ($this->center!="auto") {
+			if ($this->is_lat_long($this->center)) { // if centering the map on a lat/long
+				$this->output_js_contents .= 'var myLatlng = new google.maps.LatLng('.$this->center.');';
+			}else{  // if centering the map on an address
+				$lat_long = $this->get_lat_long_from_address($this->center);
+				$this->output_js_contents .= 'var myLatlng = new google.maps.LatLng('.$lat_long[0].', '.$lat_long[1].');';
+			}
 		}
 		
 		$this->output_js_contents .= '
 				var myOptions = {
 			  		';
 		if ($this->zoom=="auto") { $this->output_js_contents .= 'zoom: 13,'; }else{ $this->output_js_contents .= 'zoom: '.$this->zoom.','; }
+		if ($this->center!="auto") { $this->output_js_contents .= '
+					center: myLatlng,'; }
 		$this->output_js_contents .= '
-					center: myLatlng,
 			  		mapTypeId: google.maps.MapTypeId.'.$this->map_type;
 		if ($this->backgroundColor) {
 			$this->output_js_contents .= ',
@@ -1127,6 +1133,28 @@ class Googlemaps {
 		$this->output_js_contents .= '}
 				'.$this->map_name.' = new google.maps.Map(document.getElementById("'.$this->map_div_id.'"), myOptions);
 				';
+		
+		if ($this->center=="auto") { // if wanting to center on the users location
+			$this->output_js_contents .= '
+				// Try W3C Geolocation (Preferred)
+				if(navigator.geolocation) {
+					navigator.geolocation.getCurrentPosition(function(position) {
+						var myLatlng = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+						'.$this->map_name.'.setCenter(myLatlng);
+					}, function() { alert("Unable to get your current position. Please try again. Geolocation service failed."); });
+				// Try Google Gears Geolocation
+				} else if (google.gears) {
+					var geo = google.gears.factory.create(\'beta.geolocation\');
+					geo.getCurrentPosition(function(position) {
+						var myLatlng = new google.maps.LatLng(position.latitude,position.longitude);
+						'.$this->map_name.'.setCenter(myLatlng);
+					}, function() { alert("Unable to get your current position. Please try again. Geolocation service failed."); });
+				// Browser doesn\'t support Geolocation
+				}else{
+					alert(\'Your browser does not support geolocation.\');
+				}
+			';
+		}
 		
 		if ($this->directions) {
 			$this->output_js_contents .= 'directionsDisplay.setMap('.$this->map_name.');
