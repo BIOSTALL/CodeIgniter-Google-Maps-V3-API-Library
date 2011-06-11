@@ -220,7 +220,7 @@ class Googlemaps {
 			if ($marker['onclick']!="") { $marker_output .= $marker['onclick'].'
 			'; }
 			$marker_output .= '
-			};
+			});
 			';
 		}else{
 			if ($marker['onclick']!="") { 
