@@ -22,6 +22,12 @@ class Googlemaps {
 	var $adsensePublisherID			= '';						// Your Google AdSense publisher ID
 	var $backgroundColor			= '';						// A hex color value shown as the map background when tiles have not yet loaded as the user pans
 	var $center						= "37.4419, -122.1419";		// Sets the default center location (lat/long co-ordinate or address) of the map. If defaulting to the users location set to "auto"
+	var $cluster					= FALSE;					// Whether to cluster markers
+	var $clusterGridSize			= 60;						// The grid size of a cluster in pixels
+	var $clusterMaxZoom				= '';						// The maximum zoom level that a marker can be part of a cluster
+	var $clusterZoomOnClick			= TRUE;						// Whether the default behaviour of clicking on a cluster is to zoom into it
+	var $clusterAverageCenter		= FALSE;					// Whether the center of each cluster should be the average of all markers in the cluster
+	var $clusterMinimumClusterSize	= 2;						// The minimum number of markers to be in a cluster before the markers are hidden and a count is shown
 	var $disableDefaultUI			= FALSE;					// If set to TRUE will hide the default controls (ie. zoom, scale etc)
 	var $disableDoubleClickZoom		= FALSE;					// If set to TRUE will disable zooming when a double click occurs
 	var $disableMapTypeControl		= FALSE;					// If set to TRUE will hide the MapType control (ie. Map, Satellite, Hybrid, Terrain)
@@ -987,6 +993,9 @@ class Googlemaps {
 		if ($this->center=="auto") { $this->output_js .= '
 		<script type="text/javascript" src="http://code.google.com/apis/gears/gears_init.js"></script>
 		'; }
+		if ($this->cluster) { $this->output_js .= '
+		<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
+		'; }
 		if ($this->jsfile=="") {
 			$this->output_js .= '
 			<script type="text/javascript">
@@ -1243,6 +1252,23 @@ class Googlemaps {
 			}
 		}	
 		//
+		
+		if ($this->cluster) {
+			$this->output_js_contents .= '
+			var clusterOptions = {
+				gridSize: '.$this->clusterGridSize;
+			if ($this->clusterMaxZoom!="") { $this->output_js_contents .= ',
+				maxZoom: '.$this->clusterMaxZoom; }
+			if (!$this->clusterZoomOnClick) { $this->output_js_contents .= ',
+				zoomOnClick: false'; }
+			if ($this->clusterAverageCenter) { $this->output_js_contents .= ',
+				averageCenter: true'; }
+			$this->output_js_contents .= ',
+				minimumClusterSize: '.$this->clusterMinimumClusterSize.'
+			};
+			var markerCluster = new MarkerClusterer('.$this->map_name.', markers, clusterOptions);
+			';
+		}
 		
 		// add polylines
 		if (count($this->polylines)) {
