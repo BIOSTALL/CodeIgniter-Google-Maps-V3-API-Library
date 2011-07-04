@@ -43,6 +43,7 @@ class Googlemaps {
 	var $navigationControlPosition	= '';						// The position of the Navigation control, eg. 'BOTTOM_RIGHT'
 	var $keyboardShortcuts			= TRUE;						// If set to FALSE will disable to map being controlled via the keyboard
 	var $jsfile						= '';						// Set this to the path of an external JS file if you wish the JavaScript to be placed in a file rather than output directly into the <head></head> section. The library will try to create the file if it does not exist already. Please ensure the destination file is writeable
+	var $loadAsynchronously			= FALSE;					// Load the map and API asynchronously once the page has loaded
 	var $map_div_id					= "map_canvas";				// The ID of the <div></div> that is output which contains the map
 	var $map_height					= "450px";					// The height of the map container. Any units (ie 'px') can be used. If no units are provided 'px' will be presumed
 	var $map_name					= "map";					// The JS reference to the map. Currently not used but to be used in the future when multiple maps are supported
@@ -998,17 +999,17 @@ class Googlemaps {
 		$this->output_js_contents = '';
 		$this->output_html = '';
 		
-		$this->output_js .= '
-		<script type="text/javascript" src="http://maps';
-		if ($this->https) { $this->output_js .= '-api-ssl'; }
-		$this->output_js .= '.google.com/maps/api/js?sensor='.$this->sensor;
-		if ($this->region!="" && strlen($this->region)==2) { $this->output_js .= '&region='.strtoupper($this->region); }
+		$apiLocation = 'http://maps';
+		if ($this->https) { $apiLocation .= '-api-ssl'; }
+		$apiLocation .= '.google.com/maps/api/js?sensor='.$this->sensor;
+		if ($this->region!="" && strlen($this->region)==2) { $apiLocation .= '&region='.strtoupper($this->region); }
 		$libraries = array();
 		if ($this->adsense!="") { array_push($libraries, 'adsense'); }
 		if ($this->places!="") { array_push($libraries, 'places'); }
 		if ($this->panoramio) { array_push($libraries, 'panoramio'); }
-		if (count($libraries)) { $this->output_js .= '&libraries='.implode(",", $libraries); }
-		$this->output_js .= '"></script>';
+		if (count($libraries)) { $apiLocation .= '&libraries='.implode(",", $libraries); }
+		$this->output_js .= '
+		<script type="text/javascript" src="'.$apiLocation.'"></script>';
 		if ($this->center=="auto") { $this->output_js .= '
 		<script type="text/javascript" src="http://code.google.com/apis/gears/gears_init.js"></script>
 		'; }
@@ -1491,9 +1492,21 @@ class Googlemaps {
 			';
 		}
 		
-		$this->output_js_contents .= '
+		if ($this->loadAsynchronously) {
+			$this->output_js_contents .= '
+			function loadScript() {
+				var script = document.createElement("script");
+  				script.type = "text/javascript";
+  				script.src = "'.$apiLocation.'&callback=initialize";
+  				document.body.appendChild(script);
+			}
+			window.onload = loadScript;
+			';
+		}else{
+			$this->output_js_contents .= '
 		  	window.onload = initialize;
-		';
+			';
+		}
 		
 		// Minify the Javascript if the $minifyJS config value is true. Requires Jsmin.php and PHP 5+
 		if ($this->minifyJS) {
