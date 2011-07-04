@@ -21,6 +21,7 @@ class Googlemaps {
 	var $adsensePosition			= 'TOP_CENTER';				// The position of the AdUnit
 	var $adsensePublisherID			= '';						// Your Google AdSense publisher ID
 	var $backgroundColor			= '';						// A hex color value shown as the map background when tiles have not yet loaded as the user pans
+	var $bicyclingOverlay			= FALSE;					// If set to TRUE will overlay bicycling information (ie. bike paths and suggested routes) onto the map by default 
 	var $center						= "37.4419, -122.1419";		// Sets the default center location (lat/long co-ordinate or address) of the map. If defaulting to the users location set to "auto"
 	var $cluster					= FALSE;					// Whether to cluster markers
 	var $clusterGridSize			= 60;						// The grid size of a cluster in pixels
@@ -1156,6 +1157,11 @@ class Googlemaps {
 		if ($this->trafficOverlay) {
 			$this->output_js_contents .= 'var trafficLayer = new google.maps.TrafficLayer();
 				trafficLayer.setMap('.$this->map_name.');
+				';
+		}
+		if ($this->bicyclingOverlay) {
+			$this->output_js_contents .= 'var bikeLayer = new google.maps.BicyclingLayer();
+				bikeLayer.setMap('.$this->map_name.');
 				';
 		}
 		
