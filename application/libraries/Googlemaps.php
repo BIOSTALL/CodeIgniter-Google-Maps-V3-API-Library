@@ -55,6 +55,9 @@ class Googlemaps {
 	var $maxzoom					= '';						// The maximum zoom level which will be displayed on the map
 	var $minifyJS					= FALSE;					// If TRUE will run the JavaScript through Jsmin.php (this file and PHP5+ required) to minify the code
 	var $onclick					= '';						// The JavaScript action to perform when the map is clicked
+	var	$panoramio					= FALSE;					// If TRUE will add photos from Panoramio as a layer to your maps as a series of large and small photo icons
+	var	$panoramioTag				= '';						// Restrict the set of Panoramio photos shown to those matching a certain textual tag
+	var	$panoramioUser				= '';						// Restrict the set of Panoramio photos shown to those matching a particular user
 	var $region						= '';						// Country code top-level domain (eg "uk") within which to search. Useful if supplying addresses rather than lat/longs
 	var $scaleControlPosition		= '';						// The position of the Scale control, eg. 'BOTTOM_RIGHT'
 	var $scrollwheel				= TRUE;						// If set to FALSE will disable zooming by scrolling of the mouse wheel
@@ -1003,6 +1006,7 @@ class Googlemaps {
 		$libraries = array();
 		if ($this->adsense!="") { array_push($libraries, 'adsense'); }
 		if ($this->places!="") { array_push($libraries, 'places'); }
+		if ($this->panoramio) { array_push($libraries, 'panoramio'); }
 		if (count($libraries)) { $this->output_js .= '&libraries='.implode(",", $libraries); }
 		$this->output_js .= '"></script>';
 		if ($this->center=="auto") { $this->output_js .= '
@@ -1166,6 +1170,18 @@ class Googlemaps {
 		if ($this->bicyclingOverlay) {
 			$this->output_js_contents .= 'var bikeLayer = new google.maps.BicyclingLayer();
 				bikeLayer.setMap('.$this->map_name.');
+				';
+		}
+		
+		if ($this->panoramio) {
+			$this->output_js_contents .= 'var panoramioLayer = new google.maps.panoramio.PanoramioLayer();
+				';
+			if ($this->panoramioTag!="") { $this->output_js_contents .= 'panoramioLayer.setTag("'.$this->panoramioTag.'");
+				'; }
+			if ($this->panoramioUser!="") { $this->output_js_contents .= 'panoramioLayer.setUserId("'.$this->panoramioUser.'");
+				'; }
+			$this->output_js_contents .= '
+				panoramioLayer.setMap('.$this->map_name.');
 				';
 		}
 		
