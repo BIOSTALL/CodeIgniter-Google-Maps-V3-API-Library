@@ -63,6 +63,7 @@ class Googlemaps {
 	var $zoomControlStyle			= '';						// The size of the zoom control. blank, 'SMALL' or 'LARGE' values accepted.
 	
 	var	$markers					= array();					// An array used by the library to store the markers as they are produced
+	var $markersInfo				= array();					// An array containing marker information (id, latitude, longitude etc) for use elsewhere
 	var	$polylines					= array();					// An array used by the library to store the polylines as they are produced
 	var	$polygons					= array();					// An array used by the library to store the polygons as they are produced
 	var	$circles					= array();					// An array used by the library to store the circles as they are produced
@@ -113,6 +114,7 @@ class Googlemaps {
 	{
 		
 		$marker = array();
+		$this->markersInfo['marker_'.count($this->markers)] = array();
 		
 		$marker['position'] = '';								// The position (lat/long co-ordinate or address) at which the marker will appear
 		$marker['infowindow_content'] = '';						// If not blank, creates an infowindow (aka bubble) with the content provided. Can be plain text or HTML
@@ -155,10 +157,15 @@ class Googlemaps {
 				$marker_output .= '
 			var myLatlng = new google.maps.LatLng('.$marker['position'].');
 			';
+				$explodePosition = explode(",", $marker['position']);
+				$this->markersInfo['marker_'.count($this->markers)]['latitude'] = trim($explodePosition[0]);
+				$this->markersInfo['marker_'.count($this->markers)]['longitude'] = trim($explodePosition[1]);
 			}else{
 				$lat_long = $this->get_lat_long_from_address($marker['position']);
 				$marker_output .= '
 			var myLatlng = new google.maps.LatLng('.$lat_long[0].', '.$lat_long[1].');';
+				$this->markersInfo['marker_'.count($this->markers)]['latitude'] = $lat_long[0];
+				$this->markersInfo['marker_'.count($this->markers)]['longitude'] = $lat_long[1];
 			}
 		}
 		
@@ -197,6 +204,7 @@ class Googlemaps {
 		if ($marker['title']!="") {
 			$marker_output .= ',
 				title: "'.$marker['title'].'"';
+			$this->markersInfo['marker_'.count($this->markers)]['title'] = $marker['title'];
 		}
 		if (!$marker['visible']) {
 			$marker_output .= ',
@@ -1487,7 +1495,7 @@ class Googlemaps {
 		
 		$this->output_html .= '<div id="'.$this->map_div_id.'" style="width:'.$this->map_width.'; height:'.$this->map_height.';"></div>';
 		
-		return array('js'=>$this->output_js, 'html'=>$this->output_html);
+		return array('js'=>$this->output_js, 'html'=>$this->output_html, 'markers'=>$this->markersInfo);
 	
 	}
 	
