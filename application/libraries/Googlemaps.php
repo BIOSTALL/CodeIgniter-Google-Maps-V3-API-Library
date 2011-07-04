@@ -1512,9 +1512,9 @@ class Googlemaps {
 
 		// Minify the Javascript if the $minifyJS config value is true. Requires Jsmin.php and PHP 5+
 		if ($this->minifyJS) {
-			$this->CI =& get_instance();
-			$this->CI->load->library('jsmin');
-			$this->output_js = $this->CI->jsmin->min($this->output_js);
+			$CI =& get_instance();
+			$CI->load->library('jsmin');
+			$this->output_js = $CI->jsmin->min($this->output_js);
 		}
 		
 		return array('js'=>$this->output_js, 'html'=>$this->output_html, 'markers'=>$this->markersInfo);
