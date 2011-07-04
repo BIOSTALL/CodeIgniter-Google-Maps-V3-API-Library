@@ -1001,8 +1001,7 @@ class Googlemaps {
 		$this->output_js_contents = '';
 		$this->output_html = '';
 		
-		$apiLocation = 'http://maps';
-		if ($this->https) { $apiLocation .= '-api-ssl'; }
+	if ($this->https) { $apiLocation = 'https://maps-api-ssl'; }else{ $apiLocation = 'http://maps'; }
 		$apiLocation .= '.google.com/maps/api/js?sensor='.$this->sensor;
 		if ($this->region!="" && strlen($this->region)==2) { $apiLocation .= '&region='.strtoupper($this->region); }
 		$libraries = array();
