@@ -43,6 +43,8 @@ class Googlemaps {
 	var $navigationControlPosition	= '';						// The position of the Navigation control, eg. 'BOTTOM_RIGHT'
 	var $keyboardShortcuts			= TRUE;						// If set to FALSE will disable to map being controlled via the keyboard
 	var $jsfile						= '';						// Set this to the path of an external JS file if you wish the JavaScript to be placed in a file rather than output directly into the <head></head> section. The library will try to create the file if it does not exist already. Please ensure the destination file is writeable
+	var $kmlLayerURL				= '';						// A URL to publicly available KML or GeoRSS data for displaying geographic information
+	var $kmlLayerPreserveViewport	= FALSE;					// Specifies whether the map should be adjusted to the bounds of the KmlLayer's contents. By default the map is zoomed and positioned to show the entirety of the layer's contents
 	var $loadAsynchronously			= FALSE;					// Load the map and API asynchronously once the page has loaded
 	var $map_div_id					= "map_canvas";				// The ID of the <div></div> that is output which contains the map
 	var $map_height					= "450px";					// The height of the map container. Any units (ie 'px') can be used. If no units are provided 'px' will be presumed
@@ -1171,6 +1173,20 @@ class Googlemaps {
 		if ($this->bicyclingOverlay) {
 			$this->output_js_contents .= 'var bikeLayer = new google.maps.BicyclingLayer();
 				bikeLayer.setMap('.$this->map_name.');
+				';
+		}
+		
+		if ($this->kmlLayerURL!="") {
+			$this->output_js_contents .= '
+				var kmlLayerOptions = {
+					map: '.$this->map_name;
+			if ($this->kmlLayerPreserveViewport) {
+				$this->output_js_contents .= ',
+					preserveViewport: true';
+			}
+			$this->output_js_contents .= '
+				}
+				var kmlLayer = new google.maps.KmlLayer("'.$this->kmlLayerURL.'", kmlLayerOptions);
 				';
 		}
 		
