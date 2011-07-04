@@ -39,6 +39,7 @@ class Googlemaps {
 	var $draggableCursor			= '';						// The name or url of the cursor to display on a draggable object
 	var $draggingCursor				= '';						// The name or url of the cursor to display when an object is being dragged
 	var $geocodeCaching				= FALSE;					// If set to TRUE will cache any geocode requests made when an address is used instead of a lat/long. Requires DB table to be created (see documentation)
+	var $https						= FALSE;					// If set to TRUE will load the Google Maps JavaScript API over HTTPS, allowing you to utilize the API within your HTTPS secure application 
 	var $navigationControlPosition	= '';						// The position of the Navigation control, eg. 'BOTTOM_RIGHT'
 	var $keyboardShortcuts			= TRUE;						// If set to FALSE will disable to map being controlled via the keyboard
 	var $jsfile						= '';						// Set this to the path of an external JS file if you wish the JavaScript to be placed in a file rather than output directly into the <head></head> section. The library will try to create the file if it does not exist already. Please ensure the destination file is writeable
@@ -995,7 +996,9 @@ class Googlemaps {
 		$this->output_html = '';
 		
 		$this->output_js .= '
-		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor='.$this->sensor;
+		<script type="text/javascript" src="http://maps';
+		if ($this->https) { $this->output_js .= '-api-ssl'; }
+		$this->output_js .= '.google.com/maps/api/js?sensor='.$this->sensor;
 		if ($this->region!="" && strlen($this->region)==2) { $this->output_js .= '&region='.strtoupper($this->region); }
 		$libraries = array();
 		if ($this->adsense!="") { array_push($libraries, 'adsense'); }
