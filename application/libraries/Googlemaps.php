@@ -1,4 +1,4 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * CodeIgniter Google Maps API V3 Class
@@ -50,6 +50,7 @@ class Googlemaps {
 	var $mapTypeControlStyle		= '';						// The style of the MapType control. blank, 'DROPDOWN_MENU' or 'HORIZONTAL_BAR' values accepted.
 	var $minzoom					= '';						// The minimum zoom level which will be displayed on the map
 	var $maxzoom					= '';						// The maximum zoom level which will be displayed on the map
+	var $minifyJS					= FALSE;					// If TRUE will run the JavaScript through Jsmin.php (this file and PHP5+ required) to minify the code
 	var $onclick					= '';						// The JavaScript action to perform when the map is clicked
 	var $region						= '';						// Country code top-level domain (eg "uk") within which to search. Useful if supplying addresses rather than lat/longs
 	var $scaleControlPosition		= '';						// The position of the Scale control, eg. 'BOTTOM_RIGHT'
@@ -1494,6 +1495,13 @@ class Googlemaps {
 		//
 		
 		$this->output_html .= '<div id="'.$this->map_div_id.'" style="width:'.$this->map_width.'; height:'.$this->map_height.';"></div>';
+
+		// Minify the Javascript if the $minifyJS config value is true. Requires Jsmin.php and PHP 5+
+		if ($this->minifyJS) {
+			$this->CI =& get_instance();
+			$this->CI->load->library('jsmin');
+			$this->output_js = $this->CI->jsmin->min($this->output_js);
+		}
 		
 		return array('js'=>$this->output_js, 'html'=>$this->output_html, 'markers'=>$this->markersInfo);
 	
