@@ -58,6 +58,7 @@ class Googlemaps {
 	var $sensor						= FALSE;					// Set to TRUE if being used on a device that can detect a users location
 	var $streetViewControlPosition	= '';						// The position of the Zoom control, eg. 'BOTTOM_RIGHT'
 	var	$tilt						= 0;						// The angle of tilt. Currently only supports the values 0 and 45 in SATELLITE and HYBRID map types and at certain zoom levels
+	var	$trafficOverlay				= FALSE;					// If set to TRUE will overlay traffic information onto the map by default 
 	var	$version					= "3";						// Version of the API being used. Not currently used in the library
 	var $zoom						= 13;						// The default zoom level of the map. If set to "auto" will autozoom/center to fit in all visible markers. If "auto", also overrides the $center parameter
 	var $zoomControlPosition		= '';						// The position of the Zoom control, eg. 'BOTTOM_RIGHT'
@@ -1151,6 +1152,12 @@ class Googlemaps {
 		$this->output_js_contents .= '}
 				'.$this->map_name.' = new google.maps.Map(document.getElementById("'.$this->map_div_id.'"), myOptions);
 				';
+		
+		if ($this->trafficOverlay) {
+			$this->output_js_contents .= 'var trafficLayer = new google.maps.TrafficLayer();
+				trafficLayer.setMap('.$this->map_name.');
+				';
+		}
 		
 		if ($this->center=="auto") { // if wanting to center on the users location
 			$this->output_js_contents .= '
