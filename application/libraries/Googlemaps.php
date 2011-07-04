@@ -38,6 +38,7 @@ class Googlemaps {
 	var $draggable					= TRUE;						// If set to FALSE will prevent the map from being dragged around
 	var $draggableCursor			= '';						// The name or url of the cursor to display on a draggable object
 	var $draggingCursor				= '';						// The name or url of the cursor to display when an object is being dragged
+	var $geocodeCaching				= FALSE;					// If set to TRUE will cache any geocode requests made when an address is used instead of a lat/long. Requires DB table to be created (see documentation)
 	var $navigationControlPosition	= '';						// The position of the Navigation control, eg. 'BOTTOM_RIGHT'
 	var $keyboardShortcuts			= TRUE;						// If set to FALSE will disable to map being controlled via the keyboard
 	var $jsfile						= '';						// Set this to the path of an external JS file if you wish the JavaScript to be placed in a file rather than output directly into the <head></head> section. The library will try to create the file if it does not exist already. Please ensure the destination file is writeable
@@ -1545,6 +1546,22 @@ class Googlemaps {
 		$lat = 0;
 		$lng = 0;
 		
+		if ($this->geocodeCaching) { // if caching of geocode requests is activated
+			
+			$CI =& get_instance();
+			$CI->load->database(); 
+			$CI->db->select("latitude,longitude");
+			$CI->db->from("geocoding");
+			$CI->db->where("address", trim(strtolower($address)));
+			$query = $CI->db->get();
+			
+			if ($query->num_rows()>0) {
+				$row = $query->row();
+				return array($row->latitude, $row->longitude);
+			}
+			
+		}
+		
 		$data_location = "http://maps.google.com/maps/api/geocode/json?address=".str_replace(" ", "+", $address)."&sensor=".$this->sensor;
 		if ($this->region!="" && strlen($this->region)==2) { $data_location .= "&region=".$this->region; }
 		$data = file_get_contents($data_location);
@@ -1555,6 +1572,15 @@ class Googlemaps {
 			
 			$lat = $data->results[0]->geometry->location->lat;
 			$lng = $data->results[0]->geometry->location->lng;
+			
+			if ($this->geocodeCaching) { // if we to need to cache this result
+				$data = array(
+					"address"=>trim(strtolower($address)),
+					"latitude"=>$lat,
+					"longitude"=>$lng
+				);
+				$CI->db->insert("geocoding", $data);
+			}
 			
 		}
 		
