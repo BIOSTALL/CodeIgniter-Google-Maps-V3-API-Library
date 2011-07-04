@@ -212,14 +212,14 @@ class Googlemaps {
 		}
 		$marker_output .= '		
 			};
-			marker = createMarker(markerOptions);
+			marker_'.count($this->markers).' = createMarker(markerOptions);
 			';
 		
 		if ($marker['infowindow_content']!="") {
 			$marker_output .= '
-			marker.set("content", "'.$marker['infowindow_content'].'");
+			marker_'.count($this->markers).'.set("content", "'.$marker['infowindow_content'].'");
 			
-			google.maps.event.addListener(marker, "click", function() {
+			google.maps.event.addListener(marker_'.count($this->markers).', "click", function() {
 				iw.setContent(this.get("content"));
 				iw.open('.$this->map_name.', this);
 			';
@@ -231,7 +231,7 @@ class Googlemaps {
 		}else{
 			if ($marker['onclick']!="") { 
 				$marker_output .= '
-				google.maps.event.addListener(marker, "click", function() {
+				google.maps.event.addListener(marker_'.count($this->markers).', "click", function() {
 					'.$marker['onclick'].'
 				});
 				';
@@ -240,42 +240,42 @@ class Googlemaps {
 		
 		if ($marker['ondblclick']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker, "dblclick", function() {
+			google.maps.event.addListener(marker_'.count($this->markers).', "dblclick", function() {
 				'.$marker['ondblclick'].'
 			});
 			';
 		}
 		if ($marker['onmousedown']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker, "mousedown", function() {
+			google.maps.event.addListener(marker_'.count($this->markers).', "mousedown", function() {
 				'.$marker['onmousedown'].'
 			});
 			';
 		}
 		if ($marker['onmouseout']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker, "mouseout", function() {
+			google.maps.event.addListener(marker_'.count($this->markers).', "mouseout", function() {
 				'.$marker['onmouseout'].'
 			});
 			';
 		}
 		if ($marker['onmouseover']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker, "mouseover", function() {
+			google.maps.event.addListener(marker_'.count($this->markers).', "mouseover", function() {
 				'.$marker['onmouseover'].'
 			});
 			';
 		}
 		if ($marker['onmouseup']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker, "mouseup", function() {
+			google.maps.event.addListener(marker_'.count($this->markers).', "mouseup", function() {
 				'.$marker['onmouseup'].'
 			});
 			';
 		}
 		if ($marker['onrightclick']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker, "rightclick", function() {
+			google.maps.event.addListener(marker_'.count($this->markers).', "rightclick", function() {
 				'.$marker['onrightclick'].'
 			});
 			';
@@ -284,21 +284,21 @@ class Googlemaps {
 		if ($marker['draggable']) {
 			if ($marker['ondrag']!="") { 
 				$marker_output .= '
-				google.maps.event.addListener(marker, "drag", function() {
+				google.maps.event.addListener(marker_'.count($this->markers).', "drag", function() {
 					'.$marker['ondrag'].'
 				});
 				';
 			}
 			if ($marker['ondragend']!="") { 
 				$marker_output .= '
-				google.maps.event.addListener(marker, "dragend", function() {
+				google.maps.event.addListener(marker_'.count($this->markers).', "dragend", function() {
 					'.$marker['ondragend'].'
 				});
 				';
 			}
 			if ($marker['ondragstart']!="") { 
 				$marker_output .= '
-				google.maps.event.addListener(marker, "dragstart", function() {
+				google.maps.event.addListener(marker_'.count($this->markers).', "dragstart", function() {
 					'.$marker['ondragstart'].'
 				});
 				';
