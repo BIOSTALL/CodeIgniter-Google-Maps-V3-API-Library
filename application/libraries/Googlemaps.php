@@ -1495,6 +1495,13 @@ class Googlemaps {
 		  	window.onload = initialize;
 		';
 		
+		// Minify the Javascript if the $minifyJS config value is true. Requires Jsmin.php and PHP 5+
+		if ($this->minifyJS) {
+			$CI =& get_instance();
+			$CI->load->library('jsmin');
+			$this->output_js_contents = $CI->jsmin->min($this->output_js_contents);
+		}
+		
 		if ($this->jsfile=="") { 
 			$this->output_js .= $this->output_js_contents; 
 		}else{ // if needs writing to external js file
@@ -1529,13 +1536,6 @@ class Googlemaps {
 		
 		$this->output_html .= '<div id="'.$this->map_div_id.'" style="width:'.$this->map_width.'; height:'.$this->map_height.';"></div>';
 
-		// Minify the Javascript if the $minifyJS config value is true. Requires Jsmin.php and PHP 5+
-		if ($this->minifyJS) {
-			$CI =& get_instance();
-			$CI->load->library('jsmin');
-			$this->output_js = $CI->jsmin->min($this->output_js);
-		}
-		
 		return array('js'=>$this->output_js, 'html'=>$this->output_html, 'markers'=>$this->markersInfo);
 	
 	}
