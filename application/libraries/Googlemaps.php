@@ -57,6 +57,7 @@ class Googlemaps {
 	var $minzoom					= '';						// The minimum zoom level which will be displayed on the map
 	var $maxzoom					= '';						// The maximum zoom level which will be displayed on the map
 	var $minifyJS					= FALSE;					// If TRUE will run the JavaScript through Jsmin.php (this file and PHP5+ required) to minify the code
+	var $noClear					= FALSE;					// If TRUE do not clear the contents of the map div
 	var $onboundschanged			= '';						// The JavaScript action to perform when the viewport bounds have changed
 	var $oncenterchanged			= '';						// The JavaScript action to perform when themap center property changes
 	var $onclick					= '';						// The JavaScript action to perform when the map is clicked
@@ -1146,6 +1147,10 @@ class Googlemaps {
 		if ($this->maxzoom!="") {
 			$this->output_js_contents .= ',
 					maxZoom: '.$this->maxzoom;
+		}
+		if ($this->noClear) {
+			$this->output_js_contents .= ',
+					noClear: true';
 		}
 		if ($this->navigationControlPosition!="") {
 			$this->output_js_contents .= ',
