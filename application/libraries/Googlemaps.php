@@ -159,6 +159,7 @@ class Googlemaps {
 		$marker['onmouseout'] = '';								// JavaScript performed when the mouse leaves the area of the marker icon
 		$marker['onmouseover'] = '';							// JavaScript performed when the mouse enters the area of the marker icon
 		$marker['onmouseup'] = '';								// JavaScript performed when a mouseup event occurs on a marker
+		$marker['onpositionchanged'] = '';						// JavaScript performed when the markers position changes
 		$marker['onrightclick'] = '';							// JavaScript performed when a right-click occurs on a marker
 		$marker['raiseondrag'] = TRUE;							// If FALSE, disables the raising and lowering of the icon when a marker is being dragged
 		$marker['shadow'] = '';									// The name or url of the icon’s shadow
@@ -304,6 +305,13 @@ class Googlemaps {
 			$marker_output .= '
 			google.maps.event.addListener(marker_'.count($this->markers).', "mouseup", function() {
 				'.$marker['onmouseup'].'
+			});
+			';
+		}
+		if ($marker['onpositionchanged']!="") { 
+			$marker_output .= '
+			google.maps.event.addListener(marker_'.count($this->markers).', "position_changed", function() {
+				'.$marker['onpositionchanged'].'
 			});
 			';
 		}
