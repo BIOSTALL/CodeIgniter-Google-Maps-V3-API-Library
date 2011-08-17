@@ -66,6 +66,7 @@ class Googlemaps {
 	var $ondragend					= '';						// The JavaScript action to perform when the user stops dragging the map
 	var $ondragstart				= '';						// The JavaScript action to perform when the user starts dragging the map
 	var $onidle						= '';						// The JavaScript action to perform when the map becomes idle after panning or zooming
+	var $onload						= '';						// The JavaScript action to perform when the map first loads. This library hi-jacks the window.load event so add any bespoke code using this option
 	var $onmousemove				= '';						// The JavaScript action to perform when the user's mouse moves over the map container
 	var $onmouseout					= '';						// The JavaScript action to perform when the user's mouse exits the map container
 	var $onmouseover				= '';						// The JavaScript action to perform when the user's mouse enters the map container
@@ -1511,6 +1512,11 @@ class Googlemaps {
 			$this->output_js_contents .= '
 				calcRoute(\''.$this->directionsStart.'\', \''.$this->directionsEnd.'\');
 			';
+		}
+		
+		if ($this->onload!="") {
+			$this->output_js_contents .= '
+				'.$this->onload;
 		}
 		
 		$this->output_js_contents .= '
