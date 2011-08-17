@@ -57,7 +57,21 @@ class Googlemaps {
 	var $minzoom					= '';						// The minimum zoom level which will be displayed on the map
 	var $maxzoom					= '';						// The maximum zoom level which will be displayed on the map
 	var $minifyJS					= FALSE;					// If TRUE will run the JavaScript through Jsmin.php (this file and PHP5+ required) to minify the code
+	var $onboundschanged			= '';						// The JavaScript action to perform when the viewport bounds have changed
+	var $oncenterchanged			= '';						// The JavaScript action to perform when themap center property changes
 	var $onclick					= '';						// The JavaScript action to perform when the map is clicked
+	var $ondblclick					= '';						// The JavaScript action to perform when the map is double-clicked
+	var $ondrag						= '';						// The JavaScript action to perform while the map is dragged	
+	var $ondragend					= '';						// The JavaScript action to perform when the user stops dragging the map
+	var $ondragstart				= '';						// The JavaScript action to perform when the user starts dragging the map
+	var $onidle						= '';						// The JavaScript action to perform when the map becomes idle after panning or zooming
+	var $onmousemove				= '';						// The JavaScript action to perform when the user's mouse moves over the map container
+	var $onmouseout					= '';						// The JavaScript action to perform when the user's mouse exits the map container
+	var $onmouseover				= '';						// The JavaScript action to perform when the user's mouse enters the map container
+	var $onresize					= '';						// The JavaScript action to perform when the maps div changes size
+	var $onrightclick				= '';						// The JavaScript action to perform when the map is right-clicked
+	var $ontilesloaded				= '';						// The JavaScript action to perform when the visible tiles have finished loading
+	var $onzoomchanged				= '';						// The JavaScript action to perform when the maps zoom property changes
 	var	$panoramio					= FALSE;					// If TRUE will add photos from Panoramio as a layer to your maps as a series of large and small photo icons
 	var	$panoramioTag				= '';						// Restrict the set of Panoramio photos shown to those matching a certain textual tag
 	var	$panoramioUser				= '';						// Restrict the set of Panoramio photos shown to those matching a particular user
@@ -1296,9 +1310,93 @@ class Googlemaps {
 			
 		}
 		
+		if ($this->onboundschanged!="") { 
+			$this->output_js_contents .= 'google.maps.event.addListener(map, "bounds_changed", function(event) {
+    			'.$this->onboundschanged.'
+  			});
+			';
+		}
+		if ($this->oncenterchanged!="") { 
+			$this->output_js_contents .= 'google.maps.event.addListener(map, "center_changed", function(event) {
+    			'.$this->oncenterchanged.'
+  			});
+			';
+		}
 		if ($this->onclick!="") { 
 			$this->output_js_contents .= 'google.maps.event.addListener(map, "click", function(event) {
     			'.$this->onclick.'
+  			});
+			';
+		}
+		if ($this->ondblclick!="") { 
+			$this->output_js_contents .= 'google.maps.event.addListener(map, "dblclick", function(event) {
+    			'.$this->ondblclick.'
+  			});
+			';
+		}
+		if ($this->ondrag!="") { 
+			$this->output_js_contents .= 'google.maps.event.addListener(map, "drag", function(event) {
+    			'.$this->ondrag.'
+  			});
+			';
+		}
+		if ($this->ondragend!="") { 
+			$this->output_js_contents .= 'google.maps.event.addListener(map, "dragend", function(event) {
+    			'.$this->ondragend.'
+  			});
+			';
+		}
+		if ($this->ondragstart!="") { 
+			$this->output_js_contents .= 'google.maps.event.addListener(map, "dragstart", function(event) {
+    			'.$this->ondragstart.'
+  			});
+			';
+		}
+		if ($this->onidle!="") { 
+			$this->output_js_contents .= 'google.maps.event.addListener(map, "idle", function(event) {
+    			'.$this->onidle.'
+  			});
+			';
+		}
+		if ($this->onmousemove!="") { 
+			$this->output_js_contents .= 'google.maps.event.addListener(map, "mousemove", function(event) {
+    			'.$this->onmousemove.'
+  			});
+			';
+		}
+		if ($this->onmouseout!="") { 
+			$this->output_js_contents .= 'google.maps.event.addListener(map, "mouseout", function(event) {
+    			'.$this->onmouseout.'
+  			});
+			';
+		}
+		if ($this->onmouseover!="") { 
+			$this->output_js_contents .= 'google.maps.event.addListener(map, "mouseover", function(event) {
+    			'.$this->onmouseover.'
+  			});
+			';
+		}
+		if ($this->onresize!="") { 
+			$this->output_js_contents .= 'google.maps.event.addListener(map, "resize", function(event) {
+    			'.$this->onresize.'
+  			});
+			';
+		}
+		if ($this->onrightclick!="") { 
+			$this->output_js_contents .= 'google.maps.event.addListener(map, "rightclick", function(event) {
+    			'.$this->onrightclick.'
+  			});
+			';
+		}
+		if ($this->ontilesloaded!="") { 
+			$this->output_js_contents .= 'google.maps.event.addListener(map, "tilesloaded", function(event) {
+    			'.$this->ontilesloaded.'
+  			});
+			';
+		}
+		if ($this->onzoomchanged!="") { 
+			$this->output_js_contents .= 'google.maps.event.addListener(map, "zoom_changed", function(event) {
+    			'.$this->onzoomchanged.'
   			});
 			';
 		}
