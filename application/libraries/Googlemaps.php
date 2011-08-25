@@ -82,6 +82,9 @@ class Googlemaps {
 	var $scrollwheel				= TRUE;						// If set to FALSE will disable zooming by scrolling of the mouse wheel
 	var $sensor						= FALSE;					// Set to TRUE if being used on a device that can detect a users location
 	var $streetViewControlPosition	= '';						// The position of the Zoom control, eg. 'BOTTOM_RIGHT'
+	var $styles						= array();					// An array of styles used to colour aspects of the map and turn points of interest on and off
+	var $stylesAsMapTypes			= false;					// If applying styles, whether to apply them to the default map or add them as additional map types
+	var $stylesAsMapTypesDefault	= '';						// If $stylesAsMapTypes is true the default style. Should contain the 'Name' of the style
 	var	$tilt						= 0;						// The angle of tilt. Currently only supports the values 0 and 45 in SATELLITE and HYBRID map types and at certain zoom levels
 	var	$trafficOverlay				= FALSE;					// If set to TRUE will overlay traffic information onto the map by default 
 	var	$version					= "3";						// Version of the API being used. Not currently used in the library
@@ -1070,8 +1073,28 @@ class Googlemaps {
 		
 		$this->output_js_contents .= 'function initialize() {
 				
+				 ';
+		
+		$styleOutput = '';
+		if (count($this->styles)) {
+			$styles = 0;
+			foreach ($this->styles as $style) {
+				$this->output_js_contents .= 'var styles_'.$styles.' = '.json_encode($style['definition']).';
 				';
-
+				
+				if ($this->stylesAsMapTypes) {
+					$this->output_js_contents .= 'var styles_'.$styles.' = new google.maps.StyledMapType(styles_'.$styles.', {name:"'.$style['name'].'"});
+				';
+				}else{
+					$styleOutput .= $this->map_name.'.setOptions({styles: styles_'.$styles.'});
+				';
+					break;
+				}
+				
+				$styles++;
+			}
+		}
+		
 		if ($this->center!="auto") {
 			if ($this->is_lat_long($this->center)) { // if centering the map on a lat/long
 				$this->output_js_contents .= 'var myLatlng = new google.maps.LatLng('.$this->center.');';
@@ -1134,6 +1157,7 @@ class Googlemaps {
 					keyboardShortcuts: false';
 		}
 		$mapTypeControlOptions = array();
+		$map_types = array();
 		if ($this->mapTypeControlPosition!="") {
 			array_push($mapTypeControlOptions, 'position: google.maps.ControlPosition.'.strtoupper($this->mapTypeControlPosition));
 		}
@@ -1141,13 +1165,29 @@ class Googlemaps {
 			array_push($mapTypeControlOptions, 'style: google.maps.MapTypeControlStyle.'.strtoupper($this->mapTypeControlStyle));
 		}
 		if (count($this->map_types_available)) {
-			$map_types = array();
 			foreach ($this->map_types_available as $map_type) { array_push($map_types, 'google.maps.MapTypeId.'.strtoupper($map_type)); }
+		}
+		if (count($this->styles) && $this->stylesAsMapTypes) {
+			$styles = 0;
+			foreach ($this->styles as $style) {
+				array_push($map_types, '"style'.$styles.'"');
+				$styleOutput .= '
+					  '.$this->map_name.'.mapTypes.set("style'.$styles.'", styles_'.$styles.');
+				';
+				if ($this->stylesAsMapTypesDefault==$style['name']) {
+				$styleOutput .= '
+					  '.$this->map_name.'.setMapTypeId("style'.$styles.'");
+				';
+				}
+				$styles++;
+			}
+		}
+		if (count($map_types)) { 
 			array_push($mapTypeControlOptions, 'mapTypeIds: ['.implode(", ", $map_types).']');
 		}
 		if (count($mapTypeControlOptions)) {
 			$this->output_js_contents .= ',
-						mapTypeControlOptions: {'.implode(",", $mapTypeControlOptions).'}';
+					mapTypeControlOptions: {'.implode(",", $mapTypeControlOptions).'}';
 		}
 		if ($this->minzoom!="") {
 			$this->output_js_contents .= ',
@@ -1191,6 +1231,11 @@ class Googlemaps {
 		$this->output_js_contents .= '}
 				'.$this->map_name.' = new google.maps.Map(document.getElementById("'.$this->map_div_id.'"), myOptions);
 				';
+		
+		if ($styleOutput!="") {
+			$this->output_js_contents .= $styleOutput.'
+				';
+		}
 		
 		if ($this->trafficOverlay) {
 			$this->output_js_contents .= 'var trafficLayer = new google.maps.TrafficLayer();
