@@ -1733,7 +1733,7 @@ class Googlemaps {
 	function is_lat_long($input)
 	{
 		
-		$input = str_replace(", ", ",", $input);
+		$input = str_replace(", ", ",", trim($input));
 		$input = explode(",", $input);
 		if (count($input)==2) {
 		
