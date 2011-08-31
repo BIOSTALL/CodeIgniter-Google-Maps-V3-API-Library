@@ -1028,7 +1028,7 @@ class Googlemaps {
 		$this->output_js_contents = '';
 		$this->output_html = '';
 		
-	if ($this->https) { $apiLocation = 'https://maps-api-ssl'; }else{ $apiLocation = 'http://maps'; }
+		if ($this->https) { $apiLocation = 'https://maps-api-ssl'; }else{ $apiLocation = 'http://maps'; }
 		$apiLocation .= '.google.com/maps/api/js?sensor='.$this->sensor;
 		if ($this->region!="" && strlen($this->region)==2) { $apiLocation .= '&region='.strtoupper($this->region); }
 		$libraries = array();
@@ -1771,7 +1771,8 @@ class Googlemaps {
 			
 		}
 		
-		$data_location = "http://maps.google.com/maps/api/geocode/json?address=".str_replace(" ", "+", $address)."&sensor=".$this->sensor;
+		if ($this->https) { $data_location = 'https://'; }else{ $data_location = 'http://'; }
+		$data_location .= "maps.google.com/maps/api/geocode/json?address=".urlencode($address)."&sensor=".$this->sensor;
 		if ($this->region!="" && strlen($this->region)==2) { $data_location .= "&region=".$this->region; }
 		$data = file_get_contents($data_location);
 		
