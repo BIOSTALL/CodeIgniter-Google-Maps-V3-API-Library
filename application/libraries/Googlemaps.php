@@ -107,6 +107,8 @@ class Googlemaps {
 	var $directionsMode				= "DRIVING"; 				// DRIVING, WALKING or BICYCLING (US Only) - The vehicle/mode of transport to show directions for
 	var $directionsAvoidTolls		= FALSE;					// Whether or not directions should avoid tolls
 	var $directionsAvoidHighways	= FALSE;					// Whether or not directions should avoid highways
+	var $directionsDraggable		= FALSE;					// Whether or not directions on the map are draggable
+	var $directionsChanged			= "";						// JavaScript to perform when directions are dragged
 	
 	var $places						= FALSE;					// Whether or not the map will be used to show places
 	var $placesLocation				= '';						// A point (lat/long co-ordinate or address) on the map if the search for places is based around a central point
@@ -1057,8 +1059,15 @@ class Googlemaps {
 			var lat_longs = new Array();
 			var markers = new Array();
 			';
-		if ($this->directions) { 
-			$this->output_js_contents .= 'var directionsDisplay = new google.maps.DirectionsRenderer();
+		if ($this->directions) {
+			$rendererOptions = '';
+			if ($this->directionsDraggable) {
+				$this->output_js_contents .= '
+			var rendererOptions = { draggable: true };
+			';
+				$rendererOptions = 'rendererOptions';
+			}
+			$this->output_js_contents .= 'var directionsDisplay = new google.maps.DirectionsRenderer('.$rendererOptions.');
 			var directionsService = new google.maps.DirectionsService();
 			';
 		}
@@ -1301,6 +1310,12 @@ class Googlemaps {
 			';
 			if ($this->directionsDivID!="") {
 				$this->output_js_contents .= 'directionsDisplay.setPanel(document.getElementById("'.$this->directionsDivID.'"));
+			';
+			}
+			if ($this->directionsDraggable && $this->directionsChanged!="") {
+				$this->output_js_contents .= 'google.maps.event.addListener(directionsDisplay, "directions_changed", function() {
+					'.$this->directionsChanged.'
+				});
 			';
 			}
 		}
