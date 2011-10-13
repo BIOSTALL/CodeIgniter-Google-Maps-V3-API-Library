@@ -1059,6 +1059,10 @@ class Googlemaps {
 			var lat_longs = new Array();
 			var markers = new Array();
 			';
+		if ($this->cluster) {
+			$this->output_js_contents .= 'var markerCluster;
+			';
+		}
 		if ($this->directions) {
 			$rendererOptions = '';
 			if ($this->directionsDraggable) {
@@ -1496,7 +1500,7 @@ class Googlemaps {
 			$this->output_js_contents .= ',
 				minimumClusterSize: '.$this->clusterMinimumClusterSize.'
 			};
-			var markerCluster = new MarkerClusterer('.$this->map_name.', markers, clusterOptions);
+			markerCluster = new MarkerClusterer('.$this->map_name.', markers, clusterOptions);
 			';
 		}
 		
