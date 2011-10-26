@@ -81,7 +81,19 @@ class Googlemaps {
 	var $scaleControlPosition		= '';						// The position of the Scale control, eg. 'BOTTOM_RIGHT'
 	var $scrollwheel				= TRUE;						// If set to FALSE will disable zooming by scrolling of the mouse wheel
 	var $sensor						= FALSE;					// Set to TRUE if being used on a device that can detect a users location
-	var $streetViewControlPosition	= '';						// The position of the Street View control, eg. 'BOTTOM_RIGHT'
+	var $streetViewAddressControl	= TRUE;						// If set to FALSE will hide the Address control
+	var $streetViewAddressPosition	= '';						// The position of the Address control, eg. 'BOTTOM'
+	var $streetViewControlPosition	= '';						// The position of the Street View control when viewing normal aerial map, eg. 'BOTTOM_RIGHT'
+	var $streetViewCloseButton		= FALSE;					// If set to TRUE will show the close button in the top right. The close button allows users to return to the aerial map
+	var $streetViewLinksControl		= TRUE;						// If set to FALSE will hide the Links control
+	var $streetViewPanControl		= TRUE;						// If set to FALSE will hide the Pan control
+	var $streetViewPanPosition		= '';						// The position of the Scale control, eg. 'TOP_RIGHT'
+	var $streetViewPovHeading		= 0;						// The Street View camera heading in degrees relative to true north. True north is 0, east is 90, south is 180, west is 270
+	var $streetViewPovPitch			= 0;						// The Street View camera pitch in degrees, relative to the street view vehicle. Directly upwards is 90, Directly downwards is -90.
+	var $streetViewPovZoom			= 0;						// The Street View zoom level. Fully zoomed-out is level 0, zooming in increases the zoom level.
+	var $streetViewZoomControl		= TRUE;						// If set to FALSE will hide the Zoom control
+	var $streetViewZoomPosition		= '';						// The position of the Scale control, eg. 'TOP_RIGHT'
+	var $streetViewZoomStyle		= '';						// The size of the Street View zoom control. blank, 'SMALL' or 'LARGE' values accepted.
 	var $styles						= array();					// An array of styles used to colour aspects of the map and turn points of interest on and off
 	var $stylesAsMapTypes			= false;					// If applying styles, whether to apply them to the default map or add them as additional map types
 	var $stylesAsMapTypesDefault	= '';						// If $stylesAsMapTypes is true the default style. Should contain the 'Name' of the style
@@ -1123,8 +1135,9 @@ class Googlemaps {
 		if ($this->zoom=="auto") { $this->output_js_contents .= 'zoom: 13,'; }else{ $this->output_js_contents .= 'zoom: '.$this->zoom.','; }
 		if ($this->center!="auto") { $this->output_js_contents .= '
 					center: myLatlng,'; }
+		if (strtolower($this->map_type)=="street") { $map_type = "ROADMAP"; }else{ $map_type = $this->map_type; }
 		$this->output_js_contents .= '
-			  		mapTypeId: google.maps.MapTypeId.'.$this->map_type;
+			  		mapTypeId: google.maps.MapTypeId.'.$map_type;
 		if ($this->backgroundColor) {
 			$this->output_js_contents .= ',
 					backgroundColor: \''.$this->backgroundColor.'\'';
@@ -1285,6 +1298,67 @@ class Googlemaps {
 			$this->output_js_contents .= '
 				panoramioLayer.setMap('.$this->map_name.');
 				';
+		}
+		
+		if (strtolower($this->map_type)=="street") { // if defaulting the map to Street View
+			$this->output_js_contents .= '
+			  	var streetViewOptions = {
+			    	position: myLatlng';
+			if (!$this->streetViewAddressControl) {
+				$this->output_js_contents .= ',
+					addressControl: false';
+			}
+			if ($this->streetViewAddressPosition!="") {
+				$this->output_js_contents .= ',
+					addressControlOptions: { position: google.maps.ControlPosition.'.$this->streetViewAddressPosition.' }';
+			}
+			if ($this->streetViewCloseButton) {
+				$this->output_js_contents .= ',
+					enableCloseButton: true';
+			}
+			if (!$this->streetViewLinksControl) {
+				$this->output_js_contents .= ',
+					linksControl: false';
+			}
+			if (!$this->streetViewPanControl) {
+				$this->output_js_contents .= ',
+					panControl: false';
+			}
+			if ($this->streetViewPanPosition!="") {
+				$this->output_js_contents .= ',
+					panControlOptions: { position: google.maps.ControlPosition.'.$this->streetViewPanPosition.' }';
+			}
+			if ($this->streetViewPovHeading!=0 || $this->streetViewPovPitch!=0 || $this->streetViewPovZoom!=0) {
+				$this->output_js_contents .= ',
+					pov: {
+						heading: '.$this->streetViewPovHeading.',
+						pitch: '.$this->streetViewPovPitch.',
+						zoom: '.$this->streetViewPovZoom.'
+					}';
+			}
+			if (!$this->streetViewZoomControl) {
+				$this->output_js_contents .= ',
+					zoomControl: false';
+			}
+			if ($this->streetViewZoomPosition!="" || $this->streetViewZoomStyle!="") {
+				$this->output_js_contents .= ',
+					zoomControlOptions: {';
+				if ($this->streetViewZoomPosition!="") {
+					$this->output_js_contents .= '
+						position: google.maps.ControlPosition.'.$this->streetViewZoomPosition.',';
+				}
+				if ($this->streetViewZoomStyle!="") {
+					$this->output_js_contents .= '
+						style: google.maps.ZoomControlStyle.'.$this->streetViewZoomStyle.',';
+				}
+				$this->output_js_contents = trim($this->output_js_contents, ",");
+				$this->output_js_contents .= '}';
+			}
+			$this->output_js_contents .= '
+				};
+				var streetView = new google.maps.StreetViewPanorama(document.getElementById("'.$this->map_div_id.'"), streetViewOptions);
+				streetView.setVisible(true);
+	      		';
 		}
 		
 		if ($this->center=="auto") { // if wanting to center on the users location
