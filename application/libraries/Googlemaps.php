@@ -81,7 +81,7 @@ class Googlemaps {
 	var $scaleControlPosition		= '';						// The position of the Scale control, eg. 'BOTTOM_RIGHT'
 	var $scrollwheel				= TRUE;						// If set to FALSE will disable zooming by scrolling of the mouse wheel
 	var $sensor						= FALSE;					// Set to TRUE if being used on a device that can detect a users location
-	var $streetViewControlPosition	= '';						// The position of the Zoom control, eg. 'BOTTOM_RIGHT'
+	var $streetViewControlPosition	= '';						// The position of the Street View control, eg. 'BOTTOM_RIGHT'
 	var $styles						= array();					// An array of styles used to colour aspects of the map and turn points of interest on and off
 	var $stylesAsMapTypes			= false;					// If applying styles, whether to apply them to the default map or add them as additional map types
 	var $stylesAsMapTypesDefault	= '';						// If $stylesAsMapTypes is true the default style. Should contain the 'Name' of the style
