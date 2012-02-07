@@ -45,6 +45,7 @@ class Googlemaps {
 	var $jsfile						= '';						// Set this to the path of an external JS file if you wish the JavaScript to be placed in a file rather than output directly into the <head></head> section. The library will try to create the file if it does not exist already. Please ensure the destination file is writeable
 	var $kmlLayerURL				= '';						// A URL to publicly available KML or GeoRSS data for displaying geographic information
 	var $kmlLayerPreserveViewport	= FALSE;					// Specifies whether the map should be adjusted to the bounds of the KmlLayer's contents. By default the map is zoomed and positioned to show the entirety of the layer's contents
+	var $language					= '';						// The map will by default load in the language of the browser. This can be overriden however here. For a full list of codes see https://spreadsheets.google.com/pub?key=p9pdwsai2hDMsLkXsoM05KQ&gid=1
 	var $loadAsynchronously			= FALSE;					// Load the map and API asynchronously once the page has loaded
 	var $map_div_id					= "map_canvas";				// The ID of the <div></div> that is output which contains the map
 	var $map_height					= "450px";					// The height of the map container. Any units (ie 'px') can be used. If no units are provided 'px' will be presumed
@@ -1045,6 +1046,7 @@ class Googlemaps {
 		if ($this->https) { $apiLocation = 'https://maps-api-ssl'; }else{ $apiLocation = 'http://maps'; }
 		$apiLocation .= '.google.com/maps/api/js?sensor='.$this->sensor;
 		if ($this->region!="" && strlen($this->region)==2) { $apiLocation .= '&region='.strtoupper($this->region); }
+		if ($this->language!="") { $apiLocation .= '&language='.$this->language; }
 		$libraries = array();
 		if ($this->adsense!="") { array_push($libraries, 'adsense'); }
 		if ($this->places!="") { array_push($libraries, 'places'); }
