@@ -1054,7 +1054,7 @@ class Googlemaps {
 		if (count($libraries)) { $apiLocation .= '&libraries='.implode(",", $libraries); }
 		$this->output_js .= '
 		<script type="text/javascript" src="'.$apiLocation.'"></script>';
-		if ($this->center=="auto") { $this->output_js .= '
+		if ($this->center=="auto" || $this->directionsStart=="auto") { $this->output_js .= '
 		<script type="text/javascript" src="http://code.google.com/apis/gears/gears_init.js"></script>
 		'; }
 		if ($this->cluster) { $this->output_js .= '
@@ -1368,15 +1368,13 @@ class Googlemaps {
 				// Try W3C Geolocation (Preferred)
 				if(navigator.geolocation) {
 					navigator.geolocation.getCurrentPosition(function(position) {
-						var myLatlng = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
-						'.$this->map_name.'.setCenter(myLatlng);
+						'.$this->map_name.'.setCenter(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
 					}, function() { alert("Unable to get your current position. Please try again. Geolocation service failed."); });
 				// Try Google Gears Geolocation
 				} else if (google.gears) {
 					var geo = google.gears.factory.create(\'beta.geolocation\');
 					geo.getCurrentPosition(function(position) {
-						var myLatlng = new google.maps.LatLng(position.latitude,position.longitude);
-						'.$this->map_name.'.setCenter(myLatlng);
+						'.$this->map_name.'.setCenter(new google.maps.LatLng(position.latitude,position.longitude));
 					}, function() { alert("Unable to get your current position. Please try again. Geolocation service failed."); });
 				// Browser doesn\'t support Geolocation
 				}else{
@@ -1649,9 +1647,31 @@ class Googlemaps {
 		}
 		
 		if ($this->directions && $this->directionsStart!="" && $this->directionsEnd!="") {
-			$this->output_js_contents .= '
+			if ($this->directionsStart=="auto") {
+				$this->output_js_contents .= '
+				// Try W3C Geolocation (Preferred)
+				if(navigator.geolocation) {
+					navigator.geolocation.getCurrentPosition(function(position) {
+						start = position.coords.latitude+","+position.coords.longitude;
+						calcRoute(start, \''.$this->directionsEnd.'\');
+					}, function() { alert("Unable to get your current position. Please try again. Geolocation service failed."); });
+				// Try Google Gears Geolocation
+				} else if (google.gears) {
+					var geo = google.gears.factory.create(\'beta.geolocation\');
+					geo.getCurrentPosition(function(position) {
+						start = position.latitude+","+position.longitude;
+						calcRoute(start, \''.$this->directionsEnd.'\');
+					}, function() { alert("Unable to get your current position. Please try again. Geolocation service failed."); });
+				// Browser doesn\'t support Geolocation
+				}else{
+					alert(\'Your browser does not support geolocation.\');
+				}
+				';
+			}else{
+				$this->output_js_contents .= '
 				calcRoute(\''.$this->directionsStart.'\', \''.$this->directionsEnd.'\');
-			';
+				';
+			}
 		}
 		
 		if ($this->onload!="") {
@@ -1679,6 +1699,7 @@ class Googlemaps {
 		if ($this->directions) {
 			
 			$this->output_js_contents .= 'function calcRoute(start, end) {
+
 			var request = {
 			    	origin:start,
 			    	destination:end,
