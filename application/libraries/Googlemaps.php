@@ -1451,6 +1451,8 @@ class Googlemaps {
 			
 			$this->output_js_contents .= '
 			google.maps.event.addListener(drawingManager, "overlaycomplete", function(event) {
+				var newShape = event.overlay;
+				newShape.type = event.type;
 				';
 			if (count($this->drawingOnComplete)) {
 				foreach ($this->drawingOnComplete as $shape=>$js) {
@@ -1462,25 +1464,39 @@ class Googlemaps {
 			}
 			
 			if (count($this->drawingOnEdit)) {
-				$this->output_js_contents .= '
-				var newShape = event.overlay;
-				newShape.type = event.type;
-				';
 				
 				if (isset($this->drawingOnEdit['polygon'])) {
 					$this->output_js_contents .= '
 				if (newShape.type==google.maps.drawing.OverlayType.POLYGON) {
-					google.maps.event.addListener(newShape.getPath(), "set_at", function(event) {
-						'.$this->drawingOnEdit['polygon'].'
-					});
+					var newShapePaths = newShape.getPaths();
+					for (var i=0; i<newShapePaths.length; i++) {
+						google.maps.event.addListener(newShapePaths.getAt(i), "set_at", function(event) {
+							'.$this->drawingOnEdit['polygon'].'
+						});
+						google.maps.event.addListener(newShapePaths.getAt(i), "insert_at", function(event) {
+							'.$this->drawingOnEdit['polygon'].'
+						});
+						google.maps.event.addListener(newShapePaths.getAt(i), "remove_at", function(event) {
+							'.$this->drawingOnEdit['polygon'].'
+						});
+					}
 				}';
 				}
 				if (isset($this->drawingOnEdit['polyline'])) {
 					$this->output_js_contents .= '
 				if (newShape.type==google.maps.drawing.OverlayType.POLYLINE) {
-					google.maps.event.addListener(newShape.getPath(), "set_at", function(event) {
-						'.$this->drawingOnEdit['polyline'].'
-					});
+					var newShapePaths = newShape.getPaths();
+					for (var i=0; i<newShapePaths.length; i++) {
+						google.maps.event.addListener(newShapePaths.getAt(i), "set_at", function(event) {
+							'.$this->drawingOnEdit['polyline'].'
+						});
+						google.maps.event.addListener(newShapePaths.getAt(i), "insert_at", function(event) {
+							'.$this->drawingOnEdit['polyline'].'
+						});
+						google.maps.event.addListener(newShapePaths.getAt(i), "remove_at", function(event) {
+							'.$this->drawingOnEdit['polyline'].'
+						});
+					}
 				}';
 				}
 				if (isset($this->drawingOnEdit['rectangle'])) {
