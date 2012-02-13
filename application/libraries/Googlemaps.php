@@ -1111,6 +1111,10 @@ class Googlemaps {
 			$this->output_js_contents .= 'var adUnit;
 			'; 
 		}
+		if ($this->drawing) { 
+			$this->output_js_contents .= 'var drawingManager;
+			'; 
+		}
 		
 		$this->output_js_contents .= 'function initialize() {
 				
@@ -1416,7 +1420,7 @@ class Googlemaps {
 			
 			if ($this->drawingControlPosition=='') { $this->drawingControlPosition = 'TOP_CENTER'; }
 			
-			$this->output_js_contents .= 'var drawingManager = new google.maps.drawing.DrawingManager({
+			$this->output_js_contents .= 'drawingManager = new google.maps.drawing.DrawingManager({
 				drawingMode: google.maps.drawing.OverlayType.'.strtoupper($this->drawingDefaultMode).',
   				drawingControl: '.(!$this->drawingControl ? 'false' : 'true').',
   				drawingControlOptions: {
