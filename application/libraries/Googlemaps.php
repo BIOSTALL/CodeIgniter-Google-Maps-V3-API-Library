@@ -129,6 +129,7 @@ class Googlemaps {
 	var $drawingDefaultMode			= 'marker';					// The default mode for the Drawing Manager. Accepted values are marker, polygon, polyline, rectangle, circle, or null. null means that the user can interact with the map as normal when the map loads, and clicks do not draw anything.
 	var $drawingModes				= array();					// An array of modes available for use. Accepted values are marker, polygon, polyline, rectangle, circle
 	var $drawingOnComplete			= array();					// An array of JS to execute when shapes are completed, one array element per shape. For example: array('circle'=>'JS here', 'polygon'=>'JS here');
+	var $drawingOnEdit				= array();					// An array of JS to execute when shapes are changed/resized, one array element per shape. For example: array('circle'=>'JS here', 'polygon'=>'JS here');
 	
 	var $places						= FALSE;					// Whether or not the map will be used to show places
 	var $placesLocation				= '';						// A point (lat/long co-ordinate or address) on the map if the search for places is based around a central point
@@ -1444,18 +1445,63 @@ class Googlemaps {
 			drawingManager.setMap('.$this->map_name.');
 			';
 			
-			if (count($this->drawingOnComplete)) {
-				$this->output_js_contents .= '
+			$this->output_js_contents .= '
 			google.maps.event.addListener(drawingManager, "overlaycomplete", function(event) {
 				';
+			if (count($this->drawingOnComplete)) {
 				foreach ($this->drawingOnComplete as $shape=>$js) {
 					$this->output_js_contents .= 'if (event.type==google.maps.drawing.OverlayType.'.strtoupper($shape).') {
 						'.$js.'
 					}
 					';
 				}
-
 			}
+			
+			if (count($this->drawingOnEdit)) {
+				$this->output_js_contents .= '
+				var newShape = event.overlay;
+				newShape.type = event.type;
+				';
+				
+				if (isset($this->drawingOnEdit['polygon'])) {
+					$this->output_js_contents .= '
+				if (newShape.type==google.maps.drawing.OverlayType.POLYGON) {
+					google.maps.event.addListener(newShape.getPath(), "set_at", function(event) {
+						'.$this->drawingOnEdit['polygon'].'
+					});
+				}';
+				}
+				if (isset($this->drawingOnEdit['polyline'])) {
+					$this->output_js_contents .= '
+				if (newShape.type==google.maps.drawing.OverlayType.POLYLINE) {
+					google.maps.event.addListener(newShape.getPath(), "set_at", function(event) {
+						'.$this->drawingOnEdit['polyline'].'
+					});
+				}';
+				}
+				if (isset($this->drawingOnEdit['rectangle'])) {
+					$this->output_js_contents .= '
+				if (newShape.type==google.maps.drawing.OverlayType.RECTANGLE) {
+					google.maps.event.addListener(newShape, "bounds_changed", function(event) {
+						'.$this->drawingOnEdit['rectangle'].'
+					});
+				}';
+				}
+				if (isset($this->drawingOnEdit['circle'])) {
+					$this->output_js_contents .= '
+				if (newShape.type==google.maps.drawing.OverlayType.CIRCLE) {
+					google.maps.event.addListener(newShape, "radius_changed", function(event) {
+						'.$this->drawingOnEdit['circle'].'
+					});
+					google.maps.event.addListener(newShape, "center_changed", function(event) {
+						'.$this->drawingOnEdit['circle'].'
+					});
+				}';
+				}
+			}
+			
+			$this->output_js_contents .= '
+			});';
 
 		}
 		
