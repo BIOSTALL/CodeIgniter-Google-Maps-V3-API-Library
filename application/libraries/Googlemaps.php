@@ -584,90 +584,95 @@ class Googlemaps {
 			$polygon_output .= '];';
 			
 			$polygon_output .= $lat_long_output;
-			
-			$polygon_output .= '
-				var polygon_'.count($this->polygons).' = new google.maps.Polygon({
-    				path: polygon_plan_'.count($this->polygons).',
-    				strokeColor: "'.$polygon['strokeColor'].'",
-    				strokeOpacity: '.$polygon['strokeOpacity'].',
-    				strokeWeight: '.$polygon['strokeWeight'].',
-					fillColor: "'.$polygon['fillColor'].'",
-					fillOpacity: '.$polygon['fillOpacity'];
-			if (!$polygon['clickable']) {
-				$polygon_output .= ',
-					clickable: false';
-			}
-			if ($polygon['zIndex']!="" && is_numeric($polygon['zIndex'])) {
-				$polygon_output .= ',
-					zIndex: '.$polygon['zIndex'];
-			}
- 			$polygon_output .= '
-				});
-				
-				polygon_'.count($this->polygons).'.setMap('.$this->map_name.');
 
-			';
-			
-			if ($polygon['onclick']!="") { 
-				$polygon_output .= '
-				google.maps.event.addListener(polygon_'.count($this->polygons).', "click", function() {
-					'.$polygon['onclick'].'
-				});
-				';
-			}
-			if ($polygon['ondblclick']!="") { 
-				$polygon_output .= '
-				google.maps.event.addListener(polygon_'.count($this->polygons).', "dblclick", function() {
-					'.$polygon['ondblclick'].'
-				});
-				';
-			}
-			if ($polygon['onmousedown']!="") { 
-				$polygon_output .= '
-				google.maps.event.addListener(polygon_'.count($this->polygons).', "mousedown", function() {
-					'.$polygon['onmousedown'].'
-				});
-				';
-			}
-			if ($polygon['onmousemove']!="") { 
-				$polygon_output .= '
-				google.maps.event.addListener(polygon_'.count($this->polygons).', "mousemove", function() {
-					'.$polygon['onmousemove'].'
-				});
-				';
-			}
-			if ($polygon['onmouseout']!="") { 
-				$polygon_output .= '
-				google.maps.event.addListener(polygon_'.count($this->polygons).', "mouseout", function() {
-					'.$polygon['onmouseout'].'
-				});
-				';
-			}
-			if ($polygon['onmouseover']!="") { 
-				$polygon_output .= '
-				google.maps.event.addListener(polygon_'.count($this->polygons).', "mouseover", function() {
-					'.$polygon['onmouseover'].'
-				});
-				';
-			}
-			if ($polygon['onmouseup']!="") { 
-				$polygon_output .= '
-				google.maps.event.addListener(polygon_'.count($this->polygons).', "mouseup", function() {
-					'.$polygon['onmouseup'].'
-				});
-				';
-			}
-			if ($polygon['onrightclick']!="") { 
-				$polygon_output .= '
-				google.maps.event.addListener(polygon_'.count($this->polygons).', "rightclick", function() {
-					'.$polygon['onrightclick'].'
-				});
-				';
-			}
-			
-			array_push($this->polygons, $polygon_output);
-			
 		}
+			
+		$polygon_output .= '
+			var polygon_'.count($this->polygons).' = new google.maps.Polygon({
+    			';
+		if (count($polygon['points'])) {
+			$polygon_output .= 'path: polygon_plan_'.count($this->polygons).',
+					';
+		}
+		$polygon_output .= '
+    			strokeColor: "'.$polygon['strokeColor'].'",
+    			strokeOpacity: '.$polygon['strokeOpacity'].',
+    			strokeWeight: '.$polygon['strokeWeight'].',
+				fillColor: "'.$polygon['fillColor'].'",
+				fillOpacity: '.$polygon['fillOpacity'];
+		if (!$polygon['clickable']) {
+			$polygon_output .= ',
+				clickable: false';
+		}
+		if ($polygon['zIndex']!="" && is_numeric($polygon['zIndex'])) {
+			$polygon_output .= ',
+				zIndex: '.$polygon['zIndex'];
+		}
+ 		$polygon_output .= '
+			});
+			
+			polygon_'.count($this->polygons).'.setMap('.$this->map_name.');
+
+		';
+		
+		if ($polygon['onclick']!="") { 
+			$polygon_output .= '
+			google.maps.event.addListener(polygon_'.count($this->polygons).', "click", function() {
+				'.$polygon['onclick'].'
+			});
+			';
+		}
+		if ($polygon['ondblclick']!="") { 
+			$polygon_output .= '
+			google.maps.event.addListener(polygon_'.count($this->polygons).', "dblclick", function() {
+				'.$polygon['ondblclick'].'
+			});
+			';
+		}
+		if ($polygon['onmousedown']!="") { 
+			$polygon_output .= '
+			google.maps.event.addListener(polygon_'.count($this->polygons).', "mousedown", function() {
+				'.$polygon['onmousedown'].'
+			});
+			';
+		}
+		if ($polygon['onmousemove']!="") { 
+			$polygon_output .= '
+			google.maps.event.addListener(polygon_'.count($this->polygons).', "mousemove", function() {
+				'.$polygon['onmousemove'].'
+			});
+			';
+		}
+		if ($polygon['onmouseout']!="") { 
+			$polygon_output .= '
+			google.maps.event.addListener(polygon_'.count($this->polygons).', "mouseout", function() {
+				'.$polygon['onmouseout'].'
+			});
+			';
+		}
+		if ($polygon['onmouseover']!="") { 
+			$polygon_output .= '
+			google.maps.event.addListener(polygon_'.count($this->polygons).', "mouseover", function() {
+				'.$polygon['onmouseover'].'
+			});
+			';
+		}
+		if ($polygon['onmouseup']!="") { 
+			$polygon_output .= '
+			google.maps.event.addListener(polygon_'.count($this->polygons).', "mouseup", function() {
+				'.$polygon['onmouseup'].'
+			});
+			';
+		}
+		if ($polygon['onrightclick']!="") { 
+			$polygon_output .= '
+			google.maps.event.addListener(polygon_'.count($this->polygons).', "rightclick", function() {
+				'.$polygon['onrightclick'].'
+			});
+			';
+		}
+		
+		array_push($this->polygons, $polygon_output);
 	
 	}
 	
