@@ -123,6 +123,13 @@ class Googlemaps {
 	var $directionsDraggable		= FALSE;					// Whether or not directions on the map are draggable
 	var $directionsChanged			= "";						// JavaScript to perform when directions are dragged
 	
+	var $drawing					= FALSE;					// Whether or not the drawing library tools will be loaded
+	var $drawingControl				= TRUE;						// If set to FALSE will hide the Drawing Manager control
+	var $drawingControlPosition		= 'TOP_CENTER';				// The position of the Drawing Manager control, eg. 'TOP_RIGHT'
+	var $drawingDefaultMode			= 'marker';					// The default mode for the Drawing Manager. Accepted values are marker, polygon, polyline, rectangle, circle, or null. null means that the user can interact with the map as normal when the map loads, and clicks do not draw anything.
+	var $drawingModes				= array();					// An array of modes available for use. Accepted values are marker, polygon, polyline, rectangle, circle
+	var $drawingOnComplete			= array();					// An array of JS to execute when shapes are completed, one array element per shape. For example: array('circle'=>'JS here', 'polygon'=>'JS here');
+	
 	var $places						= FALSE;					// Whether or not the map will be used to show places
 	var $placesLocation				= '';						// A point (lat/long co-ordinate or address) on the map if the search for places is based around a central point
 	var $placesRadius				= 0;						// The radius (in meters) if search is based around a central position
@@ -1051,6 +1058,7 @@ class Googlemaps {
 		if ($this->adsense!="") { array_push($libraries, 'adsense'); }
 		if ($this->places!="") { array_push($libraries, 'places'); }
 		if ($this->panoramio) { array_push($libraries, 'panoramio'); }
+		if ($this->drawing) { array_push($libraries, 'drawing'); }
 		if (count($libraries)) { $apiLocation .= '&libraries='.implode(",", $libraries); }
 		$this->output_js .= '
 		<script type="text/javascript" src="'.$apiLocation.'"></script>';
@@ -1396,6 +1404,54 @@ class Googlemaps {
 				});
 			';
 			}
+		}
+		
+		if ($this->drawing) {
+			
+			if ($this->drawingControlPosition=='') { $this->drawingControlPosition = 'TOP_CENTER'; }
+			
+			$this->output_js_contents .= 'var drawingManager = new google.maps.drawing.DrawingManager({
+				drawingMode: google.maps.drawing.OverlayType.'.strtoupper($this->drawingDefaultMode).',
+  				drawingControl: '.(!$this->drawingControl ? 'false' : 'true').',
+  				drawingControlOptions: {
+  					position: google.maps.ControlPosition.'.strtoupper($this->drawingControlPosition);
+  			$shapeOptions = '';
+			if (count($this->drawingModes)) {		
+				$this->output_js_contents .= ',
+					drawingModes: [';
+				$i=0;
+				foreach ($this->drawingModes as $drawingMode) {
+					if ($i>0) { $this->output_js_contents .= ','; }
+					$this->output_js_contents .= 'google.maps.drawing.OverlayType.'.strtoupper($drawingMode);
+					if (strtoupper($drawingMode)!="MARKER") {
+						$shapeOptions .= ',
+						'.strtolower($drawingMode).'Options: {
+							editable: true
+						}';
+					}
+					$i++;
+				}
+				$this->output_js_contents .= ']';
+  			}
+			$this->output_js_contents .= '
+				}'.$shapeOptions.'
+			});
+			drawingManager.setMap('.$this->map_name.');
+			';
+			
+			if (count($this->drawingOnComplete)) {
+				$this->output_js_contents .= '
+			google.maps.event.addListener(drawingManager, "overlaycomplete", function(event) {
+				';
+				foreach ($this->drawingOnComplete as $shape=>$js) {
+					$this->output_js_contents .= 'if (event.type==google.maps.drawing.OverlayType.'.strtoupper($shape).') {
+						'.$js.'
+					}
+					';
+				}
+
+			}
+
 		}
 		
 		if ($this->places) {
