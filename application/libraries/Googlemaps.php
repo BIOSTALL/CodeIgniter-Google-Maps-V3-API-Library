@@ -225,8 +225,11 @@ class Googlemaps {
 		
 		$marker_output .= '	
 			var markerOptions = {
-				position: myLatlng, 
 				map: '.$this->map_name;
+		if ($marker['position']!="") {
+			$marker_output .= ',
+				position: myLatlng';
+		}
 		if (!$marker['clickable']) {
 			$marker_output .= ',
 				clickable: false';
