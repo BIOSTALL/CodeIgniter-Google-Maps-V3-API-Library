@@ -122,6 +122,7 @@ class Googlemaps {
 	var $directionsAvoidHighways	= FALSE;					// Whether or not directions should avoid highways
 	var $directionsDraggable		= FALSE;					// Whether or not directions on the map are draggable
 	var $directionsChanged			= "";						// JavaScript to perform when directions are dragged
+	var $directionsUnits			= "";						// 'metric' for kilometers and meters or 'imperial for miles and feet. Leave blank and it will default to the region or country of where directions are being obtained
 	
 	var $drawing					= FALSE;					// Whether or not the drawing library tools will be loaded
 	var $drawingControl				= TRUE;						// If set to FALSE will hide the Drawing Manager control
@@ -1838,6 +1839,10 @@ class Googlemaps {
 			if ($this->region!="" && strlen($this->region)==2) { 
 				$this->output_js_contents .= ',region: '.strtoupper($this->region).'
 					'; 
+			}
+			if (trim($this->directionsUnits)!="" && (strtolower(trim($this->directionsUnits)) == "metric" || strtolower(trim($this->directionsUnits)) == "imperial")) { 
+				$this->output_js_contents .= ',unitSystem: google.maps.UnitSystem.'.strtoupper(trim($this->directionsUnits)).'
+					';
 			}
 			if ($this->directionsAvoidTolls) { 
 				$this->output_js_contents .= ',avoidTolls: true
