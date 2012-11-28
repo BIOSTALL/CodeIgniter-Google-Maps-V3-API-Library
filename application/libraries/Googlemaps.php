@@ -282,6 +282,11 @@ class Googlemaps {
 			';
 		
 		if ($marker['infowindow_content']!="") {
+			
+			// Escape any quotes in the event that HTML is being added to the infowindow
+			$marker['infowindow_content'] = str_replace('\"', '"', $marker['infowindow_content']);
+			$marker['infowindow_content'] = str_replace('"', '\"', $marker['infowindow_content']);
+			
 			$marker_output .= '
 			marker_'.count($this->markers).'.set("content", "'.$marker['infowindow_content'].'");
 			
