@@ -290,7 +290,7 @@ class Googlemaps {
 			$marker_output .= '
 			marker_'.count($this->markers).'.set("content", "'.$marker['infowindow_content'].'");
 			
-			google.maps.event.addListener(marker_'.count($this->markers).', "click", function() {
+			google.maps.event.addListener(marker_'.count($this->markers).', "click", function(event) {
 				iw.setContent(this.get("content"));
 				iw.open('.$this->map_name.', this);
 			';
@@ -302,7 +302,7 @@ class Googlemaps {
 		}else{
 			if ($marker['onclick']!="") { 
 				$marker_output .= '
-				google.maps.event.addListener(marker_'.count($this->markers).', "click", function() {
+				google.maps.event.addListener(marker_'.count($this->markers).', "click", function(event) {
 					'.$marker['onclick'].'
 				});
 				';
@@ -311,49 +311,49 @@ class Googlemaps {
 		
 		if ($marker['ondblclick']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker_'.count($this->markers).', "dblclick", function() {
+			google.maps.event.addListener(marker_'.count($this->markers).', "dblclick", function(event) {
 				'.$marker['ondblclick'].'
 			});
 			';
 		}
 		if ($marker['onmousedown']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker_'.count($this->markers).', "mousedown", function() {
+			google.maps.event.addListener(marker_'.count($this->markers).', "mousedown", function(event) {
 				'.$marker['onmousedown'].'
 			});
 			';
 		}
 		if ($marker['onmouseout']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker_'.count($this->markers).', "mouseout", function() {
+			google.maps.event.addListener(marker_'.count($this->markers).', "mouseout", function(event) {
 				'.$marker['onmouseout'].'
 			});
 			';
 		}
 		if ($marker['onmouseover']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker_'.count($this->markers).', "mouseover", function() {
+			google.maps.event.addListener(marker_'.count($this->markers).', "mouseover", function(event) {
 				'.$marker['onmouseover'].'
 			});
 			';
 		}
 		if ($marker['onmouseup']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker_'.count($this->markers).', "mouseup", function() {
+			google.maps.event.addListener(marker_'.count($this->markers).', "mouseup", function(event) {
 				'.$marker['onmouseup'].'
 			});
 			';
 		}
 		if ($marker['onpositionchanged']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker_'.count($this->markers).', "position_changed", function() {
+			google.maps.event.addListener(marker_'.count($this->markers).', "position_changed", function(event) {
 				'.$marker['onpositionchanged'].'
 			});
 			';
 		}
 		if ($marker['onrightclick']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker_'.count($this->markers).', "rightclick", function() {
+			google.maps.event.addListener(marker_'.count($this->markers).', "rightclick", function(event) {
 				'.$marker['onrightclick'].'
 			});
 			';
@@ -362,21 +362,21 @@ class Googlemaps {
 		if ($marker['draggable']) {
 			if ($marker['ondrag']!="") { 
 				$marker_output .= '
-				google.maps.event.addListener(marker_'.count($this->markers).', "drag", function() {
+				google.maps.event.addListener(marker_'.count($this->markers).', "drag", function(event) {
 					'.$marker['ondrag'].'
 				});
 				';
 			}
 			if ($marker['ondragend']!="") { 
 				$marker_output .= '
-				google.maps.event.addListener(marker_'.count($this->markers).', "dragend", function() {
+				google.maps.event.addListener(marker_'.count($this->markers).', "dragend", function(event) {
 					'.$marker['ondragend'].'
 				});
 				';
 			}
 			if ($marker['ondragstart']!="") { 
 				$marker_output .= '
-				google.maps.event.addListener(marker_'.count($this->markers).', "dragstart", function() {
+				google.maps.event.addListener(marker_'.count($this->markers).', "dragstart", function(event) {
 					'.$marker['ondragstart'].'
 				});
 				';
