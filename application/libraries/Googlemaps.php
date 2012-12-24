@@ -172,6 +172,7 @@ class Googlemaps {
 		
 		$marker['position'] = '';								// The position (lat/long co-ordinate or address) at which the marker will appear
 		$marker['infowindow_content'] = '';						// If not blank, creates an infowindow (aka bubble) with the content provided. Can be plain text or HTML
+		$marker['id'] = '';										// The unique identifier of the marker suffix (ie. marker_yourID). If blank, this will default to marker_X where X is an incremental number
 		$marker['clickable'] = TRUE;							// Defines if the marker is clickable
 		$marker['cursor'] = '';									// The name or url of the cursor to display on hover
 		$marker['draggable'] = FALSE;							// Defines if the marker is draggable
@@ -207,20 +208,26 @@ class Googlemaps {
 			
 		}
 		
+		$marker_id = count($this->markers);
+		if (trim($marker['id']) != "")
+		{
+			$marker_id = $marker['id'];
+		}
+		
 		if ($marker['position']!="") {
 			if ($this->is_lat_long($marker['position'])) {
 				$marker_output .= '
 			var myLatlng = new google.maps.LatLng('.$marker['position'].');
 			';
 				$explodePosition = explode(",", $marker['position']);
-				$this->markersInfo['marker_'.count($this->markers)]['latitude'] = trim($explodePosition[0]);
-				$this->markersInfo['marker_'.count($this->markers)]['longitude'] = trim($explodePosition[1]);
+				$this->markersInfo['marker_'.$marker_id]['latitude'] = trim($explodePosition[0]);
+				$this->markersInfo['marker_'.$marker_id]['longitude'] = trim($explodePosition[1]);
 			}else{
 				$lat_long = $this->get_lat_long_from_address($marker['position']);
 				$marker_output .= '
 			var myLatlng = new google.maps.LatLng('.$lat_long[0].', '.$lat_long[1].');';
-				$this->markersInfo['marker_'.count($this->markers)]['latitude'] = $lat_long[0];
-				$this->markersInfo['marker_'.count($this->markers)]['longitude'] = $lat_long[1];
+				$this->markersInfo['marker_'.$marker_id]['latitude'] = $lat_long[0];
+				$this->markersInfo['marker_'.$marker_id]['longitude'] = $lat_long[1];
 			}
 		}
 		
@@ -262,7 +269,7 @@ class Googlemaps {
 		if ($marker['title']!="") {
 			$marker_output .= ',
 				title: "'.$marker['title'].'"';
-			$this->markersInfo['marker_'.count($this->markers)]['title'] = $marker['title'];
+			$this->markersInfo['marker_'.$marker_id]['title'] = $marker['title'];
 		}
 		if (!$marker['visible']) {
 			$marker_output .= ',
@@ -278,7 +285,7 @@ class Googlemaps {
 		}
 		$marker_output .= '		
 			};
-			marker_'.count($this->markers).' = createMarker(markerOptions);
+			marker_'.$marker_id.' = createMarker(markerOptions);
 			';
 		
 		if ($marker['infowindow_content']!="") {
@@ -288,9 +295,9 @@ class Googlemaps {
 			$marker['infowindow_content'] = str_replace('"', '\"', $marker['infowindow_content']);
 			
 			$marker_output .= '
-			marker_'.count($this->markers).'.set("content", "'.$marker['infowindow_content'].'");
+			marker_'.$marker_id.'.set("content", "'.$marker['infowindow_content'].'");
 			
-			google.maps.event.addListener(marker_'.count($this->markers).', "click", function(event) {
+			google.maps.event.addListener(marker_'.$marker_id.', "click", function(event) {
 				iw.setContent(this.get("content"));
 				iw.open('.$this->map_name.', this);
 			';
@@ -302,7 +309,7 @@ class Googlemaps {
 		}else{
 			if ($marker['onclick']!="") { 
 				$marker_output .= '
-				google.maps.event.addListener(marker_'.count($this->markers).', "click", function(event) {
+				google.maps.event.addListener(marker_'.$marker_id.', "click", function(event) {
 					'.$marker['onclick'].'
 				});
 				';
@@ -311,49 +318,49 @@ class Googlemaps {
 		
 		if ($marker['ondblclick']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker_'.count($this->markers).', "dblclick", function(event) {
+			google.maps.event.addListener(marker_'.$marker_id.', "dblclick", function(event) {
 				'.$marker['ondblclick'].'
 			});
 			';
 		}
 		if ($marker['onmousedown']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker_'.count($this->markers).', "mousedown", function(event) {
+			google.maps.event.addListener(marker_'.$marker_id.', "mousedown", function(event) {
 				'.$marker['onmousedown'].'
 			});
 			';
 		}
 		if ($marker['onmouseout']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker_'.count($this->markers).', "mouseout", function(event) {
+			google.maps.event.addListener(marker_'.$marker_id.', "mouseout", function(event) {
 				'.$marker['onmouseout'].'
 			});
 			';
 		}
 		if ($marker['onmouseover']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker_'.count($this->markers).', "mouseover", function(event) {
+			google.maps.event.addListener(marker_'.$marker_id.', "mouseover", function(event) {
 				'.$marker['onmouseover'].'
 			});
 			';
 		}
 		if ($marker['onmouseup']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker_'.count($this->markers).', "mouseup", function(event) {
+			google.maps.event.addListener(marker_'.$marker_id.', "mouseup", function(event) {
 				'.$marker['onmouseup'].'
 			});
 			';
 		}
 		if ($marker['onpositionchanged']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker_'.count($this->markers).', "position_changed", function(event) {
+			google.maps.event.addListener(marker_'.$marker_id.', "position_changed", function(event) {
 				'.$marker['onpositionchanged'].'
 			});
 			';
 		}
 		if ($marker['onrightclick']!="") { 
 			$marker_output .= '
-			google.maps.event.addListener(marker_'.count($this->markers).', "rightclick", function(event) {
+			google.maps.event.addListener(marker_'.$marker_id.', "rightclick", function(event) {
 				'.$marker['onrightclick'].'
 			});
 			';
@@ -362,21 +369,21 @@ class Googlemaps {
 		if ($marker['draggable']) {
 			if ($marker['ondrag']!="") { 
 				$marker_output .= '
-				google.maps.event.addListener(marker_'.count($this->markers).', "drag", function(event) {
+				google.maps.event.addListener(marker_'.$marker_id.', "drag", function(event) {
 					'.$marker['ondrag'].'
 				});
 				';
 			}
 			if ($marker['ondragend']!="") { 
 				$marker_output .= '
-				google.maps.event.addListener(marker_'.count($this->markers).', "dragend", function(event) {
+				google.maps.event.addListener(marker_'.$marker_id.', "dragend", function(event) {
 					'.$marker['ondragend'].'
 				});
 				';
 			}
 			if ($marker['ondragstart']!="") { 
 				$marker_output .= '
-				google.maps.event.addListener(marker_'.count($this->markers).', "dragstart", function(event) {
+				google.maps.event.addListener(marker_'.$marker_id.', "dragstart", function(event) {
 					'.$marker['ondragstart'].'
 				});
 				';
