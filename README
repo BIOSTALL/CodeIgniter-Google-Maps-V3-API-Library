@@ -1,0 +1,5 @@
+The library enables you to create a map and overlay multiple markers, polylines, polygons, rectangles, ground overlays and/or circles, all of which are fully customisable. The library also supports showing directions between two points, including the ability to show the textual directions alongside the map too, and marker clustering. The first stages of integration with the Google Places API are available for use too.
+
+Homepage: http://biostall.com/codeigniter-google-maps-v3-api-library
+
+Demos: http://biostall.com/demos/google-maps-v3-api-codeigniter-library
