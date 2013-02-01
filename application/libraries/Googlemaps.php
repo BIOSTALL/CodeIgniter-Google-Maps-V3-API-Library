@@ -191,7 +191,7 @@ class Googlemaps {
 		$marker['onpositionchanged'] = '';						// JavaScript performed when the markers position changes
 		$marker['onrightclick'] = '';							// JavaScript performed when a right-click occurs on a marker
 		$marker['raiseondrag'] = TRUE;							// If FALSE, disables the raising and lowering of the icon when a marker is being dragged
-		$marker['shadow'] = '';									// The name or url of the icon’s shadow
+		$marker['shadow'] = '';									// The name or url of the icon's shadow
 		$marker['title'] = '';									// The tooltip text to show on hover
 		$marker['visible'] = TRUE;								// Defines if the marker is visible by default
 		$marker['zIndex'] = '';									// The zIndex of the marker. If two markers overlap, the marker with the higher zIndex will appear on top
