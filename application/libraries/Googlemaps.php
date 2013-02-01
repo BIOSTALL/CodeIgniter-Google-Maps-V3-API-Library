@@ -139,6 +139,12 @@ class Googlemaps {
 	var $placesLocationNE			= '';						// If preferring to search within bounds the North-East position (latitude/longitude coordinate OR address)
 	var $placesTypes				= array();					// The types of places to search for. For a list of supported types see http://code.google.com/apis/maps/documentation/places/supported_types.html
 	var $placesName					= '';						// A term to be matched against when searching for places to display on the map
+	var $placesAutocompleteInputID	= '';						// The ID attribute of the textfield that the autocomplete should effect
+	var $placesAutocompleteTypes	= array();					// The types of places for the autocomplete to return. Options can be seen here https://developers.google.com/maps/documentation/javascript/places#places_autocomplete but include 'establishment' to only return business results, '(cities)', or '(regions)'
+	var $placesAutocompleteBoundSW	= '';						// By specifying an area in which to search for Places, the results are biased towards, but not restricted to, Places contained within these bounds.
+	var $placesAutocompleteBoundNE	= '';						// Both South-West (lat/long co-ordinate or address) and North-East (lat/long co-ordinate or address) values are required if wishing to set bounds
+	var $placesAutocompleteBoundsMap= FALSE;					// An alternative to setting the SW and NE bounds is to use the bounds of the current viewport. If set to TRUE, the bounds will be set to the viewport of the visible map, even if dragged or zoomed
+	var $placesAutocompleteOnChange	= '';						// The JavaScript action to perform when a place is selected
 	
 	function Googlemaps($config = array())
 	{
@@ -1122,6 +1128,11 @@ class Googlemaps {
 		if ($this->places) {
 			$this->output_js_contents .= 'var placesService;
 			';
+			if ($this->placesAutocompleteInputID != "")
+			{
+				$this->output_js_contents .= 'var placesAutocomplete;
+			';
+			}
 		}
 		if ($this->adsense) { 
 			$this->output_js_contents .= 'var adUnit;
@@ -1569,39 +1580,101 @@ class Googlemaps {
 				
 			}
 			
-			$this->output_js_contents .= 'var placesRequest = {
-				';
-			if ($placesLocationSet) {
-				$this->output_js_contents .= 'bounds: new google.maps.LatLngBounds(placesLocationSW, placesLocationNE)
+			if (($placesLocationSet || $this->placesLocation!="") || count($this->placesTypes) || $this->placesName!="")
+			{
+				$this->output_js_contents .= 'var placesRequest = {
 					';
-			}else{
-				if ($this->placesLocation!="") { // if search based on a center point
-					if ($this->is_lat_long($this->placesLocation)) { // if centering the map on a lat/long
-						$this->output_js_contents .= 'location: new google.maps.LatLng('.$this->placesLocation.')
+				if ($placesLocationSet) {
+					$this->output_js_contents .= 'bounds: new google.maps.LatLngBounds(placesLocationSW, placesLocationNE)
+						';
+				}else{
+					if ($this->placesLocation!="") { // if search based on a center point
+						if ($this->is_lat_long($this->placesLocation)) { // if centering the map on a lat/long
+							$this->output_js_contents .= 'location: new google.maps.LatLng('.$this->placesLocation.')
+						';
+						}else{  // if centering the map on an address
+							$lat_long = $this->get_lat_long_from_address($this->placesLocation);
+							$this->output_js_contents .= 'location: new google.maps.LatLng('.$lat_long[0].', '.$lat_long[1].')
+						';
+						}
+						$this->output_js_contents .= ',radius: '.$this->placesRadius.'
+						';
+					}
+				}
+				
+				if (count($this->placesTypes)) {
+					$this->output_js_contents .= ',types: [\''.implode("','", $this->placesTypes).'\']
+						';
+				}
+				if ($this->placesName!="") {
+					$this->output_js_contents .= ',name : \''.$this->placesName.'\'
+						';
+				}
+				$this->output_js_contents .= '};
+				
+				placesService = new google.maps.places.PlacesService('.$this->map_name.');
+				placesService.search(placesRequest, placesCallback);
+				';
+			}
+			
+			if ($this->placesAutocompleteInputID != "")
+			{
+				$this->output_js_contents .= 'var autocompleteOptions = {
+					';
+				$autocompleteOptions = '';
+				if ($this->placesAutocompleteBoundSW != "" && $this->placesAutocompleteBoundNE != "")
+				{
+					if ($this->is_lat_long($this->placesAutocompleteBoundSW)) {
+						$autocompleteOptionsSW = 'new google.maps.LatLng('.$this->placesAutocompleteBoundSW.')
 					';
 					}else{  // if centering the map on an address
-						$lat_long = $this->get_lat_long_from_address($this->placesLocation);
-						$this->output_js_contents .= 'location: new google.maps.LatLng('.$lat_long[0].', '.$lat_long[1].')
+						$lat_long = $this->get_lat_long_from_address($this->placesAutocompleteBoundSW);
+						$autocompleteOptionsSW = 'new google.maps.LatLng('.$lat_long[0].', '.$lat_long[1].')
 					';
 					}
-					$this->output_js_contents .= ',radius: '.$this->placesRadius.'
+					
+					if ($this->is_lat_long($this->placesAutocompleteBoundNE)) {
+						$autocompleteOptionsNE = 'new google.maps.LatLng('.$this->placesAutocompleteBoundNE.')
+					';
+					}else{  // if centering the map on an address
+						$lat_long = $this->get_lat_long_from_address($this->placesAutocompleteBoundNE);
+						$autocompleteOptionsNE = 'new google.maps.LatLng('.$lat_long[0].', '.$lat_long[1].')
+					';
+					}
+					$autocompleteOptions .= 'bounds: new google.maps.LatLngBounds('.$autocompleteOptionsSW.', '.$autocompleteOptionsNE.')';
+				}
+				if (count($this->placesAutocompleteTypes))
+				{
+					if ($autocompleteOptions != "") 
+					{
+						 $autocompleteOptions .= ',
+						 '; 
+					}
+					$autocompleteOptions .= 'types: [\''.implode("','", $this->placesAutocompleteTypes).'\']';
+				}
+				$this->output_js_contents .= $autocompleteOptions;
+				$this->output_js_contents .= '}';
+				
+				$this->output_js_contents .= '
+				var autocompleteInput = document.getElementById(\''.$this->placesAutocompleteInputID.'\');
+				
+				placesAutocomplete = new google.maps.places.Autocomplete(autocompleteInput, autocompleteOptions);
+				';
+				
+				if ($this->placesAutocompleteBoundsMap)
+				{
+					$this->output_js_contents .= 'placesAutocomplete.bindTo(\'bounds\', map);
+					';
+				}
+				
+				if ($this->placesAutocompleteOnChange != "")
+				{
+					$this->output_js_contents .= 'google.maps.event.addListener(placesAutocomplete, \'place_changed\', function() {
+						'.$this->placesAutocompleteOnChange.'
+					});
 					';
 				}
 			}
-			
-			if (count($this->placesTypes)) {
-				$this->output_js_contents .= ',types: [\''.implode("','", $this->placesTypes).'\']
-					';
-			}
-			if ($this->placesName!="") {
-				$this->output_js_contents .= ',name : \''.$this->placesName.'\'
-					';
-			}
-			$this->output_js_contents .= '};
-			
-			placesService = new google.maps.places.PlacesService('.$this->map_name.');
-			placesService.search(placesRequest, placesCallback);
-			';
 			
 		}
 		
