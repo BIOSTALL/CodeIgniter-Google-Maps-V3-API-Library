@@ -2085,11 +2085,13 @@ class Googlemaps {
 		
 	}
 	
-	function get_lat_long_from_address($address)
+	function get_lat_long_from_address($address, $attempts = 0)
 	{
 		
 		$lat = 0;
 		$lng = 0;
+		
+		$error = '';
 		
 		if ($this->geocodeCaching) { // if caching of geocode requests is activated
 			
@@ -2114,8 +2116,8 @@ class Googlemaps {
 		
 		$data = json_decode($data);
 		
-		if ($data->status=="OK") {
-			
+		if ($data->status=="OK") 
+		{
 			$lat = $data->results[0]->geometry->location->lat;
 			$lng = $data->results[0]->geometry->location->lng;
 			
@@ -2127,10 +2129,22 @@ class Googlemaps {
 				);
 				$CI->db->insert("geocoding", $data);
 			}
-			
+		}
+		else
+		{
+			if ($data->status == "OVER_QUERY_LIMIT") 
+			{
+				$error = $data->status;
+				if ($attempts < 2)
+				{
+					sleep(1);
+					++$attempts;
+					list($lat, $lng, $error) = $this->get_lat_long_from_address($address, $attempts);
+				}
+			}
 		}
 		
-		return array($lat, $lng);
+		return array($lat, $lng, $error);
 		
 	}
 	
