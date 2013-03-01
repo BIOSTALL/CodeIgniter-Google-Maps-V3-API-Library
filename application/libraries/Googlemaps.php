@@ -201,7 +201,10 @@ class Googlemaps {
 		$marker['title'] = '';									// The tooltip text to show on hover
 		$marker['visible'] = TRUE;								// Defines if the marker is visible by default
 		$marker['zIndex'] = '';									// The zIndex of the marker. If two markers overlap, the marker with the higher zIndex will appear on top
-		$marker['anchor'] = '';									// The position of the icon that should be used to anchor to the location (default is bottom middle)
+		$marker['anchor'] = '';									// The position at which to anchor an image in correspondance to the location of the marker on the map. By default, the anchor is located along the center point of the bottom of the image.
+		$marker['origin'] = '';									// The position of the image within a sprite, if any. By default, the origin is located at the top left corner of the image (0, 0).
+		$marker['scaledSize'] = '';								// The size of the entire image after scaling, if any. Use this property to stretch/shrink an image or a sprite.
+		$marker['size'] = '';									// The display size of the sprite or image. When using sprites, you must specify the sprite size. If the size is not provided, it will be set when the image loads.
 		
 		$marker_output = '';
 		
@@ -267,6 +270,18 @@ class Googlemaps {
 				if ($marker['anchor']!="") {
 					$marker_output .= ',
 						anchor: new google.maps.Point('.$marker['anchor'].')';
+				}
+				if ($marker['origin']!="") {
+					$marker_output .= ',
+						origin: new google.maps.Point('.$marker['origin'].')';
+				}
+				if ($marker['scaledSize']!="") {
+					$marker_output .= ',
+						scaledSize: new google.maps.Size('.$marker['scaledSize'].',"px","px")';
+				}
+				if ($marker['size']!="") {
+					$marker_output .= ',
+						size: new google.maps.Size('.$marker['size'].',"px","px")';
 				}
 			$marker_output .= '
 				}';	
