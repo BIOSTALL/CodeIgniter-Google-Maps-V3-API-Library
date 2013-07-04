@@ -1098,8 +1098,13 @@ class Googlemaps {
 		if ($this->panoramio) { array_push($libraries, 'panoramio'); }
 		if ($this->drawing) { array_push($libraries, 'drawing'); }
 		if (count($libraries)) { $apiLocation .= '&libraries='.implode(",", $libraries); }
-		$this->output_js .= '
-		<script type="text/javascript" src="'.$apiLocation.'"></script>';
+		
+		if (!$this->loadAsynchronously)
+		{
+			$this->output_js .= '
+			<script type="text/javascript" src="'.$apiLocation.'"></script>';
+		}
+		
 		if ($this->center=="auto" || $this->directionsStart=="auto") { $this->output_js .= '
 		<script type="text/javascript" src="http://code.google.com/apis/gears/gears_init.js"></script>
 		'; }
