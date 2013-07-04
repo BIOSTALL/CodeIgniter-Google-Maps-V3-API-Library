@@ -2041,7 +2041,7 @@ class Googlemaps {
 			';
 		}else{
 			$this->output_js_contents .= '
-		  	window.onload = initialize;
+			google.maps.event.addDomListener(window, "load", initialize);
 			';
 		}
 		
