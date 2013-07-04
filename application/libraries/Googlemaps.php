@@ -186,6 +186,10 @@ class Googlemaps {
 		$marker['draggable'] = FALSE;							// Defines if the marker is draggable
 		$marker['flat'] = FALSE;								// If set to TRUE will not display a shadow beneath the icon
 		$marker['icon'] = '';									// The name or url of the icon to use for the marker
+		$marker['icon_size'] = '';								// The display size of the sprite or image being used. When using sprites, you must specify the sprite size. Expecting two comma-separated values for width and height respectively (ie '20,30'). See https://developers.google.com/maps/documentation/javascript/3.exp/reference#Icon
+		$marker['icon_scaledSize'] = '';						// The size of the entire image after scaling, if any. Use this property to stretch/shrink an image or a sprite. Expecting two comma-separated values for width and height respectively (ie '20,30')
+		$marker['icon_origin'] = '';							// If using a sprite, the position of the image within the sprite. Expecting two comma-separated values for distance from the top and left respectively (ie '20,30')
+		$marker['icon_anchor'] = '';							// The position at which to anchor an image in correspondance to the location of the marker on the map. By default, the anchor is located along the center point of the bottom of the image. Expecting two comma-separated values (ie '20,30'). Credit to https://github.com/colethorsen
 		$marker['animation'] = ''; 								// blank, 'DROP' or 'BOUNCE'
 		$marker['onclick'] = '';								// JavaScript performed when a marker is clicked
 		$marker['ondblclick'] = '';								// JavaScript performed when a marker is double-clicked
@@ -239,6 +243,30 @@ class Googlemaps {
 			}
 		}
 		
+		if ($marker['icon']!="") {
+			$marker_output .= '
+				var marker_icon = {
+					url: "'.$marker['icon'].'"';
+			if ($marker['icon_size']!="") {
+				$marker_output .= ',
+					size: new google.maps.Size('.$marker['icon_size'].')';
+			}
+			if ($marker['icon_scaledSize']!="") {
+				$marker_output .= ',
+					scaledSize: new google.maps.Size('.$marker['icon_scaledSize'].')';
+			}
+				if ($marker['icon_origin']!="") {
+				$marker_output .= ',
+					origin: new google.maps.Point('.$marker['icon_origin'].')';
+			}
+			if ($marker['icon_anchor']!="") {
+				$marker_output .= ',
+					anchor: new google.maps.Point('.$marker['icon_anchor'].')';
+			}
+			$marker_output .= '};
+			';
+		}
+		
 		$marker_output .= '	
 			var markerOptions = {
 				map: '.$this->map_name;
@@ -264,7 +292,7 @@ class Googlemaps {
 		}
 		if ($marker['icon']!="") {
 			$marker_output .= ',
-				icon: "'.$marker['icon'].'"';
+				icon: marker_icon';
 		}
 		if (!$marker['raiseondrag']) {
 			$marker_output .= ',
