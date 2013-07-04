@@ -83,7 +83,7 @@ class Googlemaps {
 	var $region						= '';						// Country code top-level domain (eg "uk") within which to search. Useful if supplying addresses rather than lat/longs
 	var $scaleControlPosition		= '';						// The position of the Scale control, eg. 'BOTTOM_RIGHT'
 	var $scrollwheel				= TRUE;						// If set to FALSE will disable zooming by scrolling of the mouse wheel
-	var $sensor						= FALSE;					// Set to TRUE if being used on a device that can detect a users location
+	var $sensor						= 'false';					// Set to TRUE if being used on a device that can detect a users location
 	var $streetViewAddressControl	= TRUE;						// If set to FALSE will hide the Address control
 	var $streetViewAddressPosition	= '';						// The position of the Address control, eg. 'BOTTOM'
 	var $streetViewControlPosition	= '';						// The position of the Street View control when viewing normal aerial map, eg. 'BOTTOM_RIGHT'
@@ -203,6 +203,10 @@ class Googlemaps {
 		$marker['title'] = '';									// The tooltip text to show on hover
 		$marker['visible'] = TRUE;								// Defines if the marker is visible by default
 		$marker['zIndex'] = '';									// The zIndex of the marker. If two markers overlap, the marker with the higher zIndex will appear on top
+		$marker['anchor'] = '';									// The position at which to anchor an image in correspondance to the location of the marker on the map. By default, the anchor is located along the center point of the bottom of the image.
+		$marker['origin'] = '';									// The position of the image within a sprite, if any. By default, the origin is located at the top left corner of the image (0, 0).
+		$marker['scaledSize'] = '';								// The size of the entire image after scaling, if any. Use this property to stretch/shrink an image or a sprite.
+		$marker['size'] = '';									// The display size of the sprite or image. When using sprites, you must specify the sprite size. If the size is not provided, it will be set when the image loads.
 		
 		$marker_output = '';
 		
@@ -264,7 +268,25 @@ class Googlemaps {
 		}
 		if ($marker['icon']!="") {
 			$marker_output .= ',
-				icon: "'.$marker['icon'].'"';
+				icon: {url: "'.$marker['icon'].'"';
+				if ($marker['anchor']!="") {
+					$marker_output .= ',
+						anchor: new google.maps.Point('.$marker['anchor'].')';
+				}
+				if ($marker['origin']!="") {
+					$marker_output .= ',
+						origin: new google.maps.Point('.$marker['origin'].')';
+				}
+				if ($marker['scaledSize']!="") {
+					$marker_output .= ',
+						scaledSize: new google.maps.Size('.$marker['scaledSize'].',"px","px")';
+				}
+				if ($marker['size']!="") {
+					$marker_output .= ',
+						size: new google.maps.Size('.$marker['size'].',"px","px")';
+				}
+			$marker_output .= '
+				}';	
 		}
 		if (!$marker['raiseondrag']) {
 			$marker_output .= ',
