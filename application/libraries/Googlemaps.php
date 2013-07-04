@@ -1120,7 +1120,6 @@ class Googlemaps {
 
 		$this->output_js_contents .= '
 			var '.$this->map_name.'; // Global declaration of the map
-			var iw = new google.maps.InfoWindow(); // Global declaration of the infowindow
 			var lat_longs = new Array();
 			var markers = new Array();
 			';
@@ -1159,6 +1158,8 @@ class Googlemaps {
 		}
 		
 		$this->output_js_contents .= 'function initialize() {
+				
+				var iw = new google.maps.InfoWindow();
 				
 				 ';
 		
