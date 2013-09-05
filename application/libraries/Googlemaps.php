@@ -1347,7 +1347,7 @@ class Googlemaps {
 		}
 		if ($this->panControlPosition!="") {
 			$this->output_js_contents .= ',
-					panControlOptions: {position: google.maps.ControlPosition.'.strtoupper($this->scaleControlPosition).'}';
+					panControlOptions: {position: google.maps.ControlPosition.'.strtoupper($this->panControlPosition).'}';
 		}
 		if (!$this->scrollwheel) {
 			$this->output_js_contents .= ',
