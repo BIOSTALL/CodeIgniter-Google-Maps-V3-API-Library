@@ -1134,9 +1134,6 @@ class Googlemaps {
 			<script type="text/javascript" src="'.$apiLocation.'"></script>';
 		}
 		
-		if ($this->center=="auto" || $this->directionsStart=="auto") { $this->output_js .= '
-		<script type="text/javascript" src="http://code.google.com/apis/gears/gears_init.js"></script>
-		'; }
 		if ($this->cluster) { $this->output_js .= '
 		<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
 		'; }
@@ -1466,12 +1463,6 @@ class Googlemaps {
 				if(navigator.geolocation) {
 					navigator.geolocation.getCurrentPosition(function(position) {
 						'.$this->map_name.'.setCenter(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
-					}, function() { alert("Unable to get your current position. Please try again. Geolocation service failed."); });
-				// Try Google Gears Geolocation
-				} else if (google.gears) {
-					var geo = google.gears.factory.create(\'beta.geolocation\');
-					geo.getCurrentPosition(function(position) {
-						'.$this->map_name.'.setCenter(new google.maps.LatLng(position.latitude,position.longitude));
 					}, function() { alert("Unable to get your current position. Please try again. Geolocation service failed."); });
 				// Browser doesn\'t support Geolocation
 				}else{
@@ -1921,13 +1912,6 @@ class Googlemaps {
 				if(navigator.geolocation) {
 					navigator.geolocation.getCurrentPosition(function(position) {
 						start = position.coords.latitude+","+position.coords.longitude;
-						calcRoute(start, \''.$this->directionsEnd.'\');
-					}, function() { alert("Unable to get your current position. Please try again. Geolocation service failed."); });
-				// Try Google Gears Geolocation
-				} else if (google.gears) {
-					var geo = google.gears.factory.create(\'beta.geolocation\');
-					geo.getCurrentPosition(function(position) {
-						start = position.latitude+","+position.longitude;
 						calcRoute(start, \''.$this->directionsEnd.'\');
 					}, function() { alert("Unable to get your current position. Please try again. Geolocation service failed."); });
 				// Browser doesn\'t support Geolocation
