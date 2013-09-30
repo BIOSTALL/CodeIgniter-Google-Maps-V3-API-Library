@@ -1104,40 +1104,42 @@ class Googlemaps {
 	
 	function create_map()
 	{
-	
 		$this->output_js = '';
 		$this->output_js_contents = '';
 		$this->output_html = '';
 		
-		if ($this->apiKey!="") 
+		if ($this->maps_loaded == 0)
 		{
-			if ($this->https) { $apiLocation = 'https'; }else{ $apiLocation = 'http'; }
-			$apiLocation .= '://maps.googleapis.com/maps/api/js?key='.$this->apiKey.'&';
+			if ($this->apiKey!="") 
+			{
+				if ($this->https) { $apiLocation = 'https'; }else{ $apiLocation = 'http'; }
+				$apiLocation .= '://maps.googleapis.com/maps/api/js?key='.$this->apiKey.'&';
+			}
+			else
+			{
+				if ($this->https) { $apiLocation = 'https://maps-api-ssl'; }else{ $apiLocation = 'http://maps'; }
+				$apiLocation .= '.google.com/maps/api/js?';
+			}
+			$apiLocation .= 'sensor='.$this->sensor;
+			if ($this->region!="" && strlen($this->region)==2) { $apiLocation .= '&region='.strtoupper($this->region); }
+			if ($this->language!="") { $apiLocation .= '&language='.$this->language; }
+			$libraries = array();
+			if ($this->adsense!="") { array_push($libraries, 'adsense'); }
+			if ($this->places!="") { array_push($libraries, 'places'); }
+			if ($this->panoramio) { array_push($libraries, 'panoramio'); }
+			if ($this->drawing) { array_push($libraries, 'drawing'); }
+			if (count($libraries)) { $apiLocation .= '&libraries='.implode(",", $libraries); }
+			
+			if (!$this->loadAsynchronously)
+			{
+				$this->output_js .= '
+				<script type="text/javascript" src="'.$apiLocation.'"></script>';
+			}
+			
+			if ($this->cluster) { $this->output_js .= '
+			<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
+			'; }
 		}
-		else
-		{
-			if ($this->https) { $apiLocation = 'https://maps-api-ssl'; }else{ $apiLocation = 'http://maps'; }
-			$apiLocation .= '.google.com/maps/api/js?';
-		}
-		$apiLocation .= 'sensor='.$this->sensor;
-		if ($this->region!="" && strlen($this->region)==2) { $apiLocation .= '&region='.strtoupper($this->region); }
-		if ($this->language!="") { $apiLocation .= '&language='.$this->language; }
-		$libraries = array();
-		if ($this->adsense!="") { array_push($libraries, 'adsense'); }
-		if ($this->places!="") { array_push($libraries, 'places'); }
-		if ($this->panoramio) { array_push($libraries, 'panoramio'); }
-		if ($this->drawing) { array_push($libraries, 'drawing'); }
-		if (count($libraries)) { $apiLocation .= '&libraries='.implode(",", $libraries); }
-		
-		if (!$this->loadAsynchronously)
-		{
-			$this->output_js .= '
-			<script type="text/javascript" src="'.$apiLocation.'"></script>';
-		}
-		
-		if ($this->cluster) { $this->output_js .= '
-		<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
-		'; }
 		if ($this->jsfile=="") {
 			$this->output_js .= '
 			<script type="text/javascript">
