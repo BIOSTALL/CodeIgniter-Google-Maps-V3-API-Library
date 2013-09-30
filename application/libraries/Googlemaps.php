@@ -55,6 +55,7 @@ class Googlemaps {
 	var $map_type					= "ROADMAP";				// The default MapType. Values accepted are 'HYBRID', 'ROADMAP', 'SATELLITE' or 'TERRAIN'
 	var $map_types_available		= array();					// The other MapTypes available for selection on the map
 	var $map_width					= "100%";					// The width of the map container. Any units (ie 'px') can be used. If no units are provided 'px' will be presumed
+	var $maps_loaded				= 0;						// Counter which keeps track of how many maps have been created to avoid standard functions being output twice
 	var $mapTypeControlPosition		= '';						// The position of the MapType control, eg. 'BOTTOM_RIGHT'
 	var $mapTypeControlStyle		= '';						// The style of the MapType control. blank, 'DROPDOWN_MENU' or 'HORIZONTAL_BAR' values accepted.
 	var $minzoom					= '';						// The minimum zoom level which will be displayed on the map
