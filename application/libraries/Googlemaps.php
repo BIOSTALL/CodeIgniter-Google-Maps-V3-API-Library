@@ -1215,7 +1215,7 @@ class Googlemaps {
 					break;
 				}
 				
-				$styles++;
+				++$styles;
 			}
 		}
 		
