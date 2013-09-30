@@ -2088,8 +2088,6 @@ class Googlemaps {
 			</script>';
 		}
 		
-		
-		
 		// set height and width
 		if (is_numeric($this->map_width)) { // if no width type set
 			$this->map_width = $this->map_width.'px';
