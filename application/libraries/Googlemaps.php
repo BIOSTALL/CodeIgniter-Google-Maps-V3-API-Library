@@ -2178,12 +2178,15 @@ class Googlemaps {
 			$lng = $data->results[0]->geometry->location->lng;
 			
 			if ($this->geocodeCaching) { // if we to need to cache this result
-				$data = array(
-					"address"=>trim(strtolower($address)),
-					"latitude"=>$lat,
-					"longitude"=>$lng
-				);
-				$CI->db->insert("geocoding", $data);
+				if ($address != "" && $lat != 0 && $lng != 0)
+				{
+					$data = array(
+						"address"=>trim(strtolower($address)),
+						"latitude"=>$lat,
+						"longitude"=>$lng
+					);
+					$CI->db->insert("geocoding", $data);
+				}
 			}
 		}
 		else
