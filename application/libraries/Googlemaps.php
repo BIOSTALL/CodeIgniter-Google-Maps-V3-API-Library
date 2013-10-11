@@ -45,7 +45,7 @@ class Googlemaps {
 	var $infowindowMaxWidth			= 0;						// The maximum width of the infowindow in pixels. Expecting an integer without units
 	var $keyboardShortcuts			= TRUE;						// If set to FALSE will disable to map being controlled via the keyboard
 	var $jsfile						= '';						// Set this to the path of an external JS file if you wish the JavaScript to be placed in a file rather than output directly into the <head></head> section. The library will try to create the file if it does not exist already. Please ensure the destination file is writeable
-	var $kmlLayerURL				= '';						// A URL to publicly available KML or GeoRSS data for displaying geographic information
+	var $kmlLayerURL				= '';						// A URL to publicly available KML or GeoRSS data for displaying geographic information. Multiple KML layers can be passed in by using an array of URL's. Note, if using multiple you'll probably have to set $kmlLayerPreserveViewport to true and manually set map center and zoom
 	var $kmlLayerPreserveViewport	= FALSE;					// Specifies whether the map should be adjusted to the bounds of the KmlLayer's contents. By default the map is zoomed and positioned to show the entirety of the layer's contents
 	var $language					= '';						// The map will by default load in the language of the browser. This can be overriden however here. For a full list of codes see https://spreadsheets.google.com/pub?key=p9pdwsai2hDMsLkXsoM05KQ&gid=1
 	var $loadAsynchronously			= FALSE;					// Load the map and API asynchronously once the page has loaded
@@ -1376,20 +1376,34 @@ class Googlemaps {
 				';
 		}
 		
-		if ($this->kmlLayerURL!="") {
-			$this->output_js_contents .= '
-				var kmlLayerOptions = {
-					map: '.$this->map_name;
-			if ($this->kmlLayerPreserveViewport) {
-				$this->output_js_contents .= ',
-					preserveViewport: true';
+		if ((is_array($this->kmlLayerURL) && count($this->kmlLayerURL)) || (!is_array($this->kmlLayerURL) && $this->kmlLayerURL != ""))
+		{
+			if (!is_array($this->kmlLayerURL))
+			{
+				// Need to convert single KML layer to array
+				$this->kmlLayerURL = array($this->kmlLayerURL);
 			}
-			$this->output_js_contents .= '
+			if (count($this->kmlLayerURL))
+			{
+				$i = 0;
+				foreach ($this->kmlLayerURL as $kmlLayerURL)
+				{
+					$this->output_js_contents .= '
+						var kmlLayerOptions = {
+							map: '.$this->map_name;
+					if ($this->kmlLayerPreserveViewport) {
+						$this->output_js_contents .= ',
+							preserveViewport: true';
+					}
+					$this->output_js_contents .= '
+						}
+						var kmlLayer_'.$i.' = new google.maps.KmlLayer("'.$kmlLayerURL.'", kmlLayerOptions);
+						';
+					++$i;
 				}
-				var kmlLayer = new google.maps.KmlLayer("'.$this->kmlLayerURL.'", kmlLayerOptions);
-				';
+			}
 		}
-		
+
 		if ($this->panoramio) {
 			$this->output_js_contents .= 'var panoramioLayer = new google.maps.panoramio.PanoramioLayer();
 				';
