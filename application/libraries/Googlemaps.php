@@ -1919,7 +1919,7 @@ class Googlemaps {
 		    	';
 		    if ($this->adsenseChannelNumber!="") { $this->output_js_contents .= 'channelNumber: "'.$this->adsenseChannelNumber.'",
 		    	'; }
-		    $this->output_js_contents .= 'map: map,
+		    $this->output_js_contents .= 'map: '.$this->map_name.',
 		    	visible: true
 		    };
 		    adUnit = new google.maps.adsense.AdUnit(adUnitDiv, adUnitOptions);
