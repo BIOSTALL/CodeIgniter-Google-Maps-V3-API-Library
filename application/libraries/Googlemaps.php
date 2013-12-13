@@ -127,7 +127,9 @@ class Googlemaps {
 	var $directionsDraggable		= FALSE;					// Whether or not directions on the map are draggable
 	var $directionsChanged			= "";						// JavaScript to perform when directions are dragged
 	var $directionsUnits			= "";						// 'metric' for kilometers and meters or 'imperial for miles and feet. Leave blank and it will default to the region or country of where directions are being obtained
-	
+	var $directionsWaypointArray    = array();					// An array of waypoints. eg array("Boston, MA", "Times Square, NY");
+	var $directionsWaypointsOptimize= FALSE;					// Should the waypoints be optimised? If TRUE, waypoints will be re-ordered to provide the most efficient route.
+    
 	var $drawing					= FALSE;					// Whether or not the drawing library tools will be loaded
 	var $drawingControl				= TRUE;						// If set to FALSE will hide the Drawing Manager control
 	var $drawingControlPosition		= 'TOP_CENTER';				// The position of the Drawing Manager control, eg. 'TOP_RIGHT'
@@ -2008,6 +2010,22 @@ class Googlemaps {
 			    	destination:end,
 			    	travelMode: google.maps.TravelMode.'.$this->directionsMode.'
 			    	';
+					
+			if (count($this->directionsWaypointArray)) {
+				
+				$directionsWaypointStr = '';
+				foreach ($this->directionsWaypointArray as $waypoint) {
+					if ($directionsWaypointStr != '') { $directionsWaypointStr .= ','; }
+					$directionsWaypointStr .= '{ location: "' . $waypoint . '", stopover: true}';
+				}
+				$this->output_js_contents .= ', waypoints: [' . $directionsWaypointStr . ']';
+				
+				if ($this->directionsWaypointsOptimize)
+				{
+					 $this->output_js_contents .= ', optimizeWaypoints: true'
+					 ;
+				}
+            }
 			if ($this->region!="" && strlen($this->region)==2) { 
 				$this->output_js_contents .= ',region: '.strtoupper($this->region).'
 					'; 
