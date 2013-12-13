@@ -1927,7 +1927,22 @@ class Googlemaps {
 		}
 		
 		if ($this->directions && $this->directionsStart!="" && $this->directionsEnd!="") {
-			if ($this->directionsStart=="auto") {
+			if ($this->directionsStart=="auto" && $this->directionsEnd=="auto") {
+				// Both start and finish are at the users current location
+				$this->output_js_contents .= '
+				// Try W3C Geolocation (Preferred)
+				if(navigator.geolocation) {
+					navigator.geolocation.getCurrentPosition(function(position) {
+						start = position.coords.latitude+","+position.coords.longitude;
+						calcRoute(start, start);
+					}, function() { alert("Unable to get your current position. Please try again. Geolocation service failed."); });
+				// Browser doesn\'t support Geolocation
+				}else{
+					alert(\'Your browser does not support geolocation.\');
+				}
+				';
+            }else if ($this->directionsStart=="auto") {
+            	// The start point should be at the users current location
 				$this->output_js_contents .= '
 				// Try W3C Geolocation (Preferred)
 				if(navigator.geolocation) {
@@ -1940,7 +1955,22 @@ class Googlemaps {
 					alert(\'Your browser does not support geolocation.\');
 				}
 				';
+			}else if ($this->directionsEnd=="auto") {
+				// The end point should be at the users current location
+				$this->output_js_contents .= '
+				// Try W3C Geolocation (Preferred)
+				if(navigator.geolocation) {
+					navigator.geolocation.getCurrentPosition(function(position) {
+						end = position.coords.latitude+","+position.coords.longitude;
+						calcRoute(\''.$this->directionsStart.'\', end);
+					}, function() { alert("Unable to get your current position. Please try again. Geolocation service failed."); });
+				// Browser doesn\'t support Geolocation
+				}else{
+					alert(\'Your browser does not support geolocation.\');
+				}
+				';
 			}else{
+				// The start and end point are at pre-defined locations
 				$this->output_js_contents .= '
 				calcRoute(\''.$this->directionsStart.'\', \''.$this->directionsEnd.'\');
 				';
