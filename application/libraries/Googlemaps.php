@@ -50,6 +50,7 @@ class Googlemaps {
 	var $kmlLayerPreserveViewport	= FALSE;					// Specifies whether the map should be adjusted to the bounds of the KmlLayer's contents. By default the map is zoomed and positioned to show the entirety of the layer's contents
 	var $language					= '';						// The map will by default load in the language of the browser. This can be overriden however here. For a full list of codes see https://spreadsheets.google.com/pub?key=p9pdwsai2hDMsLkXsoM05KQ&gid=1
 	var $loadAsynchronously			= FALSE;					// Load the map and API asynchronously once the page has loaded
+	var $loadAsynchDelay			= 1000;						// Number of milliseconds to delay initializing asynchronously-loaded maps, to avoid problems initializing before ready
 	var $map_div_id					= "map_canvas";				// The ID of the <div></div> that is output which contains the map
 	var $map_height					= "450px";					// The height of the map container. Any units (ie 'px') can be used. If no units are provided 'px' will be presumed
 	var $map_name					= "map";					// The JS reference to the map. Currently not used but to be used in the future when multiple maps are supported
@@ -1189,6 +1190,10 @@ class Googlemaps {
 			'; 
 		}
 
+		$this->output_js_contents .= 'function initialize_'.$this->map_name.'() {
+				
+				';
+
 		$this->output_js_contents .= '
 			var iw_'.$this->map_name.' = new google.maps.InfoWindow(';
 		if ($this->infowindowMaxWidth != 0)
@@ -1200,10 +1205,6 @@ class Googlemaps {
 		$this->output_js_contents .= ');
 				
 				 ';
-		
-		$this->output_js_contents .= 'function initialize_'.$this->map_name.'() {
-				
-				';
 		
 		$styleOutput = '';
 		if (count($this->styles)) {
@@ -2113,12 +2114,17 @@ class Googlemaps {
 		if ($this->loadAsynchronously) {
 			$this->output_js_contents .= '
 			function loadScript_'.$this->map_name.'() {
-				var script = document.createElement("script");
-  				script.type = "text/javascript";
-  				script.src = "'.$apiLocation.'&callback=initialize_'.$this->map_name.'";
-  				document.body.appendChild(script);
+				if (typeof google === "object" && typeof google.maps === "object") {
+					setTimeout(initialize_'.$this->map_name.', '.$this->loadAsynchDelay.');
+					return;
+				}  else {
+					var script = document.createElement("script");
+	  				script.type = "text/javascript";
+	  				script.src = "'.$apiLocation.'&callback=initialize_'.$this->map_name.'";
+	  				document.body.appendChild(script);
+				}
 			}
-			window.onload = loadScript_'.$this->map_name.';
+			window.onload = loadScript_'.$this->map_name.'();
 			';
 		}else{
 			$this->output_js_contents .= '
