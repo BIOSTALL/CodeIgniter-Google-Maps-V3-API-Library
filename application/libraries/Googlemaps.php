@@ -1205,6 +1205,7 @@ class Googlemaps {
 		$this->output_js_contents .= ');
 				
 				 ';
+
 		
 		$styleOutput = '';
 		if (count($this->styles)) {
@@ -1746,91 +1747,91 @@ class Googlemaps {
 		}
 		
 		if ($this->onboundschanged!="") { 
-			$this->output_js_contents .= 'google.maps.event.addListener(map, "bounds_changed", function(event) {
+			$this->output_js_contents .= 'google.maps.event.addListener('.$this->map_name.', "bounds_changed", function(event) {
     			'.$this->onboundschanged.'
   			});
 			';
 		}
 		if ($this->oncenterchanged!="") { 
-			$this->output_js_contents .= 'google.maps.event.addListener(map, "center_changed", function(event) {
+			$this->output_js_contents .= 'google.maps.event.addListener('.$this->map_name.', "center_changed", function(event) {
     			'.$this->oncenterchanged.'
   			});
 			';
 		}
 		if ($this->onclick!="") { 
-			$this->output_js_contents .= 'google.maps.event.addListener(map, "click", function(event) {
+			$this->output_js_contents .= 'google.maps.event.addListener('.$this->map_name.', "click", function(event) {
     			'.$this->onclick.'
   			});
 			';
 		}
 		if ($this->ondblclick!="") { 
-			$this->output_js_contents .= 'google.maps.event.addListener(map, "dblclick", function(event) {
+			$this->output_js_contents .= 'google.maps.event.addListener('.$this->map_name.', "dblclick", function(event) {
     			'.$this->ondblclick.'
   			});
 			';
 		}
 		if ($this->ondrag!="") { 
-			$this->output_js_contents .= 'google.maps.event.addListener(map, "drag", function(event) {
+			$this->output_js_contents .= 'google.maps.event.addListener('.$this->map_name.', "drag", function(event) {
     			'.$this->ondrag.'
   			});
 			';
 		}
 		if ($this->ondragend!="") { 
-			$this->output_js_contents .= 'google.maps.event.addListener(map, "dragend", function(event) {
+			$this->output_js_contents .= 'google.maps.event.addListener('.$this->map_name.', "dragend", function(event) {
     			'.$this->ondragend.'
   			});
 			';
 		}
 		if ($this->ondragstart!="") { 
-			$this->output_js_contents .= 'google.maps.event.addListener(map, "dragstart", function(event) {
+			$this->output_js_contents .= 'google.maps.event.addListener('.$this->map_name.', "dragstart", function(event) {
     			'.$this->ondragstart.'
   			});
 			';
 		}
 		if ($this->onidle!="") { 
-			$this->output_js_contents .= 'google.maps.event.addListener(map, "idle", function(event) {
+			$this->output_js_contents .= 'google.maps.event.addListener('.$this->map_name.', "idle", function(event) {
     			'.$this->onidle.'
   			});
 			';
 		}
 		if ($this->onmousemove!="") { 
-			$this->output_js_contents .= 'google.maps.event.addListener(map, "mousemove", function(event) {
+			$this->output_js_contents .= 'google.maps.event.addListener('.$this->map_name.', "mousemove", function(event) {
     			'.$this->onmousemove.'
   			});
 			';
 		}
 		if ($this->onmouseout!="") { 
-			$this->output_js_contents .= 'google.maps.event.addListener(map, "mouseout", function(event) {
+			$this->output_js_contents .= 'google.maps.event.addListener('.$this->map_name.', "mouseout", function(event) {
     			'.$this->onmouseout.'
   			});
 			';
 		}
 		if ($this->onmouseover!="") { 
-			$this->output_js_contents .= 'google.maps.event.addListener(map, "mouseover", function(event) {
+			$this->output_js_contents .= 'google.maps.event.addListener('.$this->map_name.', "mouseover", function(event) {
     			'.$this->onmouseover.'
   			});
 			';
 		}
 		if ($this->onresize!="") { 
-			$this->output_js_contents .= 'google.maps.event.addListener(map, "resize", function(event) {
+			$this->output_js_contents .= 'google.maps.event.addListener('.$this->map_name.', "resize", function(event) {
     			'.$this->onresize.'
   			});
 			';
 		}
 		if ($this->onrightclick!="") { 
-			$this->output_js_contents .= 'google.maps.event.addListener(map, "rightclick", function(event) {
+			$this->output_js_contents .= 'google.maps.event.addListener('.$this->map_name.', "rightclick", function(event) {
     			'.$this->onrightclick.'
   			});
 			';
 		}
 		if ($this->ontilesloaded!="") { 
-			$this->output_js_contents .= 'google.maps.event.addListener(map, "tilesloaded", function(event) {
+			$this->output_js_contents .= 'google.maps.event.addListener('.$this->map_name.', "tilesloaded", function(event) {
     			'.$this->ontilesloaded.'
   			});
 			';
 		}
 		if ($this->onzoomchanged!="") { 
-			$this->output_js_contents .= 'google.maps.event.addListener(map, "zoom_changed", function(event) {
+			$this->output_js_contents .= 'google.maps.event.addListener('.$this->map_name.', "zoom_changed", function(event) {
     			'.$this->onzoomchanged.'
   			});
 			';
