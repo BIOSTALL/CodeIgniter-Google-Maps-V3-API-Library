@@ -1140,7 +1140,7 @@ class Googlemaps {
 			}
 			
 			if ($this->cluster) { $this->output_js .= '
-			<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
+			<script type="text/javascript" src="' . ( ($this->https) ? 'https' : 'http' ) . '://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
 			'; }
 		}
 		if ($this->jsfile=="") {
