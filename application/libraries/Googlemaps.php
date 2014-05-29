@@ -1154,6 +1154,7 @@ class Googlemaps {
 			var '.$this->map_name.'; // Global declaration of the map
 			var lat_longs_'.$this->map_name.' = new Array();
 			var markers_'.$this->map_name.' = new Array();
+            var iw_'.$this->map_name.';
 			';
 		if ($this->cluster) {
 			$this->output_js_contents .= 'var markerCluster;
@@ -1190,7 +1191,7 @@ class Googlemaps {
 		}
 
 		$this->output_js_contents .= '
-			var iw_'.$this->map_name.' = new google.maps.InfoWindow(';
+			iw_'.$this->map_name.' = new google.maps.InfoWindow(';
 		if ($this->infowindowMaxWidth != 0)
 		{
 			$this->output_js_contents .= '{
