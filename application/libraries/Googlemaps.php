@@ -1339,6 +1339,7 @@ class Googlemaps {
 		}
 		if ($this->scaleControlPosition!="") {
 			$this->output_js_contents .= ',
+			         scaleControl: true,
 					scaleControlOptions: {position: google.maps.ControlPosition.'.strtoupper($this->scaleControlPosition).'}';
 		}
 		if (!$this->scrollwheel) {
