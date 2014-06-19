@@ -34,6 +34,8 @@ class Googlemaps {
 	var $disableDefaultUI			= FALSE;					// If set to TRUE will hide the default controls (ie. zoom, scale etc)
 	var $disableDoubleClickZoom		= FALSE;					// If set to TRUE will disable zooming when a double click occurs
 	var $disableMapTypeControl		= FALSE;					// If set to TRUE will hide the MapType control (ie. Map, Satellite, Hybrid, Terrain)
+	var $disableZoomControl			= FALSE;					// If set to TRUE will hide the Zoom control
+	var $disablePanControl			= FALSE;					// If set to TRUE will hide the Pan control
 	var $disableNavigationControl	= FALSE;					// If set to TRUE will hide the Navigation control (ie. zoom in/out, pan)
 	var $disableScaleControl		= FALSE;					// If set to TRUE will hide the Scale control
 	var $disableStreetViewControl	= FALSE;					// If set to TRUE will hide the Street View control
@@ -79,6 +81,7 @@ class Googlemaps {
 	var $onrightclick				= '';						// The JavaScript action to perform when the map is right-clicked
 	var $ontilesloaded				= '';						// The JavaScript action to perform when the visible tiles have finished loading
 	var $onzoomchanged				= '';						// The JavaScript action to perform when the maps zoom property changes
+	var $panControlPosition			= '';						// The position of the Pan control when viewing normal aerial map, eg. 'TOP_LEFT'
 	var	$panoramio					= FALSE;					// If TRUE will add photos from Panoramio as a layer to your maps as a series of large and small photo icons
 	var	$panoramioTag				= '';						// Restrict the set of Panoramio photos shown to those matching a certain textual tag
 	var	$panoramioUser				= '';						// Restrict the set of Panoramio photos shown to those matching a particular user
@@ -1256,6 +1259,14 @@ class Googlemaps {
 			$this->output_js_contents .= ',
 					mapTypeControl: false';
 		}
+		if ($this->disableZoomControl) {
+			$this->output_js_contents .= ',
+					zoomControl: false';
+		}
+		if ($this->disablePanControl) {
+			$this->output_js_contents .= ',
+					panControl: false';
+		}
 		if ($this->disableNavigationControl) {
 			$this->output_js_contents .= ',
 					navigationControl: false';
@@ -1341,6 +1352,10 @@ class Googlemaps {
 			$this->output_js_contents .= ',
 			         scaleControl: true,
 					scaleControlOptions: {position: google.maps.ControlPosition.'.strtoupper($this->scaleControlPosition).'}';
+		}
+		if ($this->panControlPosition!="") {
+			$this->output_js_contents .= ',
+					panControlOptions: {position: google.maps.ControlPosition.'.strtoupper($this->panControlPosition).'}';
 		}
 		if (!$this->scrollwheel) {
 			$this->output_js_contents .= ',
