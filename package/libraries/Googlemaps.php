@@ -173,12 +173,22 @@ class Googlemaps {
 		}
 		
 		if ($this->sensor) { $this->sensor = "true"; }else{ $this->sensor = "false"; }
-		
+
 	}
-	
+
+	function marker_icon($symbol = '', $marker_color = 'FF0000', $font_color = '000000')
+	{
+		$url = '//chart.apis.google.com/chart?chst=d_map_pin_letter&chld=';
+		$url .= $symbol . '|';
+		$url .= $marker_color . '|';
+		$url .= $font_color;
+
+		return $url;
+	}
+
 	function add_marker($params = array())
 	{
-		
+
 		$marker = array();
 		$this->markersInfo['marker_'.count($this->markers)] = array();
 		
@@ -193,7 +203,7 @@ class Googlemaps {
 		$marker['icon_size'] = '';								// The display size of the sprite or image being used. When using sprites, you must specify the sprite size. Expecting two comma-separated values for width and height respectively (ie '20,30'). See https://developers.google.com/maps/documentation/javascript/3.exp/reference#Icon
 		$marker['icon_scaledSize'] = '';						// The size of the entire image after scaling, if any. Use this property to stretch/shrink an image or a sprite. Expecting two comma-separated values for width and height respectively (ie '20,30')
 		$marker['icon_origin'] = '';							// If using a sprite, the position of the image within the sprite. Expecting two comma-separated values for distance from the top and left respectively (ie '20,30')
-		$marker['icon_anchor'] = '';							// The position at which to anchor an image in correspondance to the location of the marker on the map. By default, the anchor is located along the center point of the bottom of the image. Expecting two comma-separated values (ie '20,30'). Credit to https://github.com/colethorsen
+		$marker['icon_anchor'] = '';							// The position at which to anchor an image in correspondence to the location of the marker on the map. By default, the anchor is located along the center point of the bottom of the image. Expecting two comma-separated values (ie '20,30'). Credit to https://github.com/colethorsen
 		$marker['animation'] = ''; 								// blank, 'DROP' or 'BOUNCE'
 		$marker['onclick'] = '';								// JavaScript performed when a marker is clicked
 		$marker['ondblclick'] = '';								// JavaScript performed when a marker is double-clicked
