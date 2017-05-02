@@ -2172,6 +2172,160 @@ class Googlemaps {
 		return array('js'=>$this->output_js, 'html'=>$this->output_html, 'markers'=>$this->markersInfo);
 	
 	}
+	  function autocomplete()
+	{
+		$this->output_js = '';
+		$this->output_js_contents = '';
+
+		if ($this->maps_loaded == 0)
+		{
+			if ($this->apiKey!="")
+			{
+				if ($this->https) { $apiLocation = 'https'; }else{ $apiLocation = 'http'; }
+				$apiLocation .= '://maps.googleapis.com/maps/api/js?key='.$this->apiKey.'&';
+			}
+			else
+			{
+				if ($this->https) { $apiLocation = 'https://maps-api-ssl'; }else{ $apiLocation = 'http://maps'; }
+				$apiLocation .= '.google.com/maps/api/js?';
+			}
+			$apiLocation .= 'sensor='.$this->sensor;
+			$libraries = array();
+			if ($this->places!="") { array_push($libraries, 'places'); }
+			if (count($libraries)) { $apiLocation .= '&libraries='.implode(",", $libraries); }
+			if (!$this->loadAsynchronously)
+			{
+				$this->output_js .= '
+				<script type="text/javascript" src="'.$apiLocation.'"></script>';
+			}
+		}
+		if ($this->jsfile=="") {
+			$this->output_js .= '
+			<script type="text/javascript">
+			//<![CDATA[
+			';
+		}
+		if ($this->places) {
+			$this->output_js_contents .= 'var placesService;
+			';
+			if ($this->placesAutocompleteInputID != "")
+			{
+				$this->output_js_contents .= 'var placesAutocomplete;
+			';
+			}
+		}
+		if ($this->places) {
+
+			$placesLocationSet = false;
+
+			if ($this->placesLocationSW!="" && $this->placesLocationNE!="") { // if search based on bounds
+
+				$placesLocationSet = true;
+
+				if ($this->is_lat_long($this->placesLocationSW)) {
+					$this->output_js_contents .= 'var placesLocationSW = new google.maps.LatLng('.$this->placesLocationSW.');
+			';
+				}
+
+				if ($this->is_lat_long($this->placesLocationNE)) {
+					$this->output_js_contents .= 'var placesLocationNE = new google.maps.LatLng('.$this->placesLocationNE.');
+			';
+				}
+
+			}
+
+			if (($placesLocationSet || $this->placesLocation!="") || count($this->placesTypes) || $this->placesName!="")
+			{
+				$this->output_js_contents .= 'var placesRequest = {
+					';
+
+				if (count($this->placesTypes)) {
+					$this->output_js_contents .= ',types: [\''.implode("','", $this->placesTypes).'\']
+						';
+				}
+				if ($this->placesName!="") {
+					$this->output_js_contents .= ',name : \''.$this->placesName.'\'
+						';
+				}
+			}
+
+			if ($this->placesAutocompleteInputID != "")
+			{
+				$this->output_js_contents .= 'var autocompleteOptions = {
+					';
+				$autocompleteOptions = '';
+				if (count($this->placesAutocompleteTypes))
+				{
+					if ($autocompleteOptions != "")
+					{
+						 $autocompleteOptions .= ',
+						 ';
+					}
+					$autocompleteOptions .= 'types: [\''.implode("','", $this->placesAutocompleteTypes).'\']';
+				}
+				$this->output_js_contents .= $autocompleteOptions;
+				$this->output_js_contents .= '}';
+
+				$this->output_js_contents .= '
+				window.onload = function(e){
+				var autocompleteInput = document.getElementById(\''.$this->placesAutocompleteInputID.'\');
+				placesAutocomplete = new google.maps.places.Autocomplete(autocompleteInput, autocompleteOptions);
+				}
+				';
+
+
+				if ($this->placesAutocompleteOnChange != "")
+				{
+					$this->output_js_contents .= 'google.maps.event.addListener(placesAutocomplete, \'place_changed\', function() {
+						'.$this->placesAutocompleteOnChange.'
+					});
+					';
+				}
+			}
+		}
+		if ($this->loadAsynchronously) {
+			$this->output_js_contents .= '
+			function loadScript_'.$this->map_name.'() {
+				var script = document.createElement("script");
+  				script.type = "text/javascript";
+  				script.src = "'.$apiLocation.'";
+  				document.body.appendChild(script);
+			}
+			';
+		}else{
+			$this->output_js_contents;
+		}
+
+		// Minify the Javascript if the $minifyJS config value is true. Requires Jsmin.php and PHP 5+
+		if ($this->minifyJS) {
+			$CI =& get_instance();
+			$CI->load->library('jsmin');
+			$this->output_js_contents = $CI->jsmin->min($this->output_js_contents);
+		}
+
+		if ($this->jsfile=="") {
+			$this->output_js .= $this->output_js_contents;
+		}else{ // if needs writing to external js file
+			if (!$handle = fopen($this->jsfile, "w")) {
+				$this->output_js .= $this->output_js_contents;
+			}else{
+				if (!fwrite($handle, $this->output_js_contents)) {
+					$this->output_js .= $this->output_js_contents;
+				}else{
+					$this->output_js .= '
+					<script src="'.$this->jsfile.'" type="text/javascript"></script>';
+				}
+			}
+		}
+
+		if ($this->jsfile=="") {
+			$this->output_js .= '
+			//]]>
+			</script>';
+		}
+		return array('js'=>$this->output_js);
+
+	}
 	
 	function is_lat_long($input)
 	{
