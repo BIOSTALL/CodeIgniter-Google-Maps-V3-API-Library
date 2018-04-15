@@ -41,7 +41,7 @@ class Googlemaps {
 	var $draggableCursor			= '';						// The name or url of the cursor to display on a draggable object
 	var $draggingCursor				= '';						// The name or url of the cursor to display when an object is being dragged
 	var $geocodeCaching				= FALSE;					// If set to TRUE will cache any geocode requests made when an address is used instead of a lat/long. Requires DB table to be created (see documentation)
-	var $https						= FALSE;					// If set to TRUE will load the Google Maps JavaScript API over HTTPS, allowing you to utilize the API within your HTTPS secure application 
+	var $https						= TRUE;					// If set to TRUE will load the Google Maps JavaScript API over HTTPS, allowing you to utilize the API within your HTTPS secure application 
 	var $navigationControlPosition	= '';						// The position of the Navigation control, eg. 'BOTTOM_RIGHT'
 	var $infowindowMaxWidth			= 0;						// The maximum width of the infowindow in pixels. Expecting an integer without units
 	var $keyboardShortcuts			= TRUE;						// If set to FALSE will disable to map being controlled via the keyboard
@@ -85,7 +85,6 @@ class Googlemaps {
 	var $region						= '';						// Country code top-level domain (eg "uk") within which to search. Useful if supplying addresses rather than lat/longs
 	var $scaleControlPosition		= '';						// The position of the Scale control, eg. 'BOTTOM_RIGHT'
 	var $scrollwheel				= TRUE;						// If set to FALSE will disable zooming by scrolling of the mouse wheel
-	var $sensor						= FALSE;					// Set to TRUE if being used on a device that can detect a users location
 	var $streetViewAddressControl	= TRUE;						// If set to FALSE will hide the Address control
 	var $streetViewAddressPosition	= '';						// The position of the Address control, eg. 'BOTTOM'
 	var $streetViewControlPosition	= '';						// The position of the Street View control when viewing normal aerial map, eg. 'BOTTOM_RIGHT'
@@ -171,9 +170,6 @@ class Googlemaps {
 				$this->$key = $val;
 			}
 		}
-		
-		if ($this->sensor) { $this->sensor = "true"; }else{ $this->sensor = "false"; }
-		
 	}
 	
 	function add_marker($params = array())
@@ -1123,7 +1119,6 @@ class Googlemaps {
 				if ($this->https) { $apiLocation = 'https://maps-api-ssl'; }else{ $apiLocation = 'http://maps'; }
 				$apiLocation .= '.google.com/maps/api/js?';
 			}
-			$apiLocation .= 'sensor='.$this->sensor;
 			if ($this->region!="" && strlen($this->region)==2) { $apiLocation .= '&region='.strtoupper($this->region); }
 			if ($this->language!="") { $apiLocation .= '&language='.$this->language; }
 			$libraries = array();
@@ -2217,11 +2212,16 @@ class Googlemaps {
 		}
 		
 		if ($this->https) { $data_location = 'https://'; }else{ $data_location = 'http://'; }
-		$data_location .= "maps.google.com/maps/api/geocode/json?address=".urlencode(utf8_encode($address))."&sensor=".$this->sensor;
+		$data_location .= "maps.googleapis.com/maps/api/geocode/json?address=".urlencode(utf8_encode($address));
 		if ($this->region!="" && strlen($this->region)==2) { $data_location .= "&region=".$this->region; }
-		$data = file_get_contents($data_location);
 		
-		$data = json_decode($data);
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $data_location);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		$output = curl_exec($ch);
+		curl_close($ch);
+		
+		$data = json_decode($output);
 		
 		if ($data->status=="OK") 
 		{
