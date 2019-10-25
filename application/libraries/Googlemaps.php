@@ -26,7 +26,9 @@ class Googlemaps {
 	var $center						= "37.4419, -122.1419";		// Sets the default center location (lat/long co-ordinate or address) of the map. If defaulting to the users location set to "auto"
 	var $class 						= '';						// A class name if wishing to style the map further through CSS. Can also be useful if wanting it to be responsive etc.
 	var $cluster					= FALSE;					// Whether to cluster markers
-	var $clusterGridSize			= 60;						// The grid size of a cluster in pixels
+	var $clusterLibrary = '';  // The cluster library to use.
+  var $clusterImagePath = ''; // Override for cluster image path.
+  var $clusterGridSize			= 60;						// The grid size of a cluster in pixels
 	var $clusterMaxZoom				= '';						// The maximum zoom level that a marker can be part of a cluster
 	var $clusterZoomOnClick			= TRUE;						// Whether the default behaviour of clicking on a cluster is to zoom into it
 	var $clusterAverageCenter		= FALSE;					// Whether the center of each cluster should be the average of all markers in the cluster
@@ -1139,9 +1141,17 @@ class Googlemaps {
 				<script type="text/javascript" src="'.$apiLocation.'"></script>';
 			}
 			
-			if ($this->cluster) { $this->output_js .= '
-			<script type="text/javascript" src="' . ( ($this->https) ? 'https' : 'http' ) . '://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
-			'; }
+			if ($this->cluster) {
+        if ($this->clusterLibrary) {
+          $this->output_js .= '
+			<script type="text/javascript" src="' . $this->clusterLibrary . '"></script>
+			';
+        } else {
+          $this->output_js .= '
+			<script type="text/javascript" src="' . (($this->https) ? 'https' : 'http') . '://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
+			';
+        }
+      }
 		}
 		if ($this->jsfile=="") {
 			$this->output_js .= '
@@ -1849,6 +1859,8 @@ class Googlemaps {
 			$this->output_js_contents .= '
 			var clusterOptions = {
 				gridSize: '.$this->clusterGridSize;
+      if ($this->clusterImagePath != "") { $this->output_js_contents .= ',
+				imagePath: \'' . $this->clusterImagePath . '\''; }
 			if ($this->clusterMaxZoom!="") { $this->output_js_contents .= ',
 				maxZoom: '.$this->clusterMaxZoom; }
 			if (!$this->clusterZoomOnClick) { $this->output_js_contents .= ',
